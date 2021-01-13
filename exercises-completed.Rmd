@@ -1,5 +1,5 @@
 ---
-title: "Exercises from Hands-On Programming with R"
+title: "Completed Exercises from Hands-On Programming with R"
 author: "Gavin McNicol"
 date: "1/13/2021"
 output: html_document
