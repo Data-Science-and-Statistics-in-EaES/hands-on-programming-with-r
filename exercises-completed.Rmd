@@ -9,22 +9,23 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Introduction
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+### Acknowledgement
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+These are the completed exercises for the 10 chapters of *Hands-On Programming with R* authored by Garrett Grolemund. The full text is freely available at <https://rstudio-education.github.io/hopr>.
 
-```{r cars}
-summary(cars)
-```
+### Purpose
 
-## Including Plots
+Although the online version of the textbook includes most of the solutions, they are embedded within all the other material. I therefore created this set of completed exercises  to:
 
-You can also embed plots, for example:
+ - **provide a concise template of completed solutions for the coding exercises**
+ 
+But also, to:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+ - **practice using pulling and pushing to Github repositories**
+ - **gain experience with RMarkdown syntax**
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+### Getting Started with R
+
+Although I highly recommend the use of [RStudio Cloud](https://rstudio.cloud/), the textbook *Hands-On Programming with R* also features a handy [Appendix](https://rstudio-education.github.io/hopr/starting.html) to guide you through setting up R and RStudio IDE (Integrated Development Environment) on your local computer.
