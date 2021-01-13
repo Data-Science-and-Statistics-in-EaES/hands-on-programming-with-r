@@ -29,3 +29,82 @@ But also, to:
 ### Getting Started with R
 
 Although I highly recommend the use of [RStudio Cloud](https://rstudio.cloud/), the textbook *Hands-On Programming with R* also features a handy [Appendix](https://rstudio-education.github.io/hopr/starting.html) to guide you through setting up R and RStudio IDE (Integrated Development Environment) on your local computer.
+
+## Chapter 1
+
+### Objects
+
+You can assign an object a name and a value as follows
+
+```{r}
+# use <- to assign the value of 1 to the object 'a'
+a <- 1
+# then test it
+a + 2
+# the output of the expression evaluated (a + 2) is displayed in the box above
+# note the use of the pound sign (#) at the start of a line lets me annotate the code
+```
+
+```{r}
+# create an object 'die that is a sequence of numbers from 1 to 6, using ':'
+die <- 1:6
+die
+```
+
+```{r}
+# R also understands capitalization in object names
+Name <- 1
+name <- 0
+
+name + 1
+```
+
+```{r}
+# R overwrites previous information without asking permission
+my_number <- 1
+my_number
+
+my_number <- 999
+my_number
+```
+
+```{r}
+# look at all the objects you have created using 'ls()'
+ls()
+```
+
+```{r}
+# you can clear all your work space objects using (remove the # first)
+# rm(list=ls())
+```
+
+```{r}
+# you can do all sorts of math with die (a sequence of numeric integers)
+die - 1
+die / 2
+die * die
+```
+
+```{r}
+# when you multiply two vectors of unequal length, R will repeat the shorter vector to match the long vector (known as 'vector recycling')
+die + 1:2
+
+# but it will produce an error when the longer objeect is not a multiple of the shorter object
+die + 1:4
+```
+
+```{r}
+# you can also do matrix multiplication
+die %*% die # inner
+die %o% die # outer
+```
+
+### Functions
+
+### Sample with replacement
+
+### Writing your own functions
+
+### Arguments
+
+### Extract Function in RStudio
