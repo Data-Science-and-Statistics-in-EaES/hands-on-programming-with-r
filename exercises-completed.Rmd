@@ -34,7 +34,7 @@ Although I highly recommend the use of [RStudio Cloud](https://rstudio.cloud/), 
 
 $~$
 
-## Chapter 1
+## Chapter 1: The Very Basics
 
 In this chapter we will cover:
 
@@ -59,12 +59,12 @@ a + 2
 ```
 
 ```{r}
-# create an object 'die that is a sequence of numbers from 1 to 6, using ':'
+# create an object, die, that is a sequence of numbers from 1 to 6, using ':'
 die <- 1:6
 die
 ```
 
-R also understands capitalization in object names
+R also understands capitalization in object names:
 
 ```{r}
 Name <- 1
@@ -73,7 +73,7 @@ name <- 0
 name + 1
 ```
 
-R overwrites previous information without asking permission
+R overwrites previous information without asking permission:
 
 ```{r}
 my_number <- 1
@@ -83,7 +83,7 @@ my_number <- 999
 my_number
 ```
 
-Look at all the objects you have created using 'ls()'
+Look at all the objects you have created using `ls()`:
 ```{r}
 ls()
 ```
@@ -132,7 +132,7 @@ round(3.1415)
 factorial(3)
 ```
 
-The data you pass the function is called the function's 'argument'. The argument can be:
+The data you pass the function is called the function's **argument**. The argument can be:
 
 ```{r}
 mean(1:6) # raw data
@@ -140,13 +140,13 @@ mean(die) # an R object
 round(mean(die)) # of even the result of another function
 ```
 
-You can "roll" the dice using the sample function, with arguments 'x' (vector/data) and 'size' (number of elements to sample):
+You can "roll" the dice using the sample function, with arguments `x` (vector/data) and `size` (number of elements to sample):
 
 ```{r}
 sample(x = 1:6, size = 2)
 ```
 
-Roll your die by setting x to 'die' and sample 1 number from it:
+Roll your die by setting x to `die` and sample 1 number from it:
 
 ```{r}
 sample(x = die, size = 1)
@@ -172,7 +172,7 @@ And if you use the wrong argument names, you will get an error:
 # this is because the function round() does not use the argument 'corners'
 ```
 
-You can look up the function's arguments with 'args':
+You can look up the function's arguments with `args`:
 
 ```{r}
 args(round) 
@@ -214,7 +214,7 @@ sample(die, size = 2)
 
 In other words, it samples *without* replacement.
 
-We need to sample *with* replacement, using the argument replace = TRUE:
+We need to sample *with* replacement, using the argument `replace = TRUE`:
 
 ```{r}
 sample(die, size = 2, replace = TRUE) 
@@ -224,7 +224,7 @@ Sampling with replacement is an easy way to create independent random samples.
 
 **Congratulations, you can now simulate rolling a pair of dice!**
 
-You can also add up the result of your simulated dice throw if you save the output to the object 'dice', then use the function sum() on dice:
+You can also add up the result of your simulated dice throw if you save the output to the object `dice`, then use the function `sum()` on dice:
 
 ```{r}
 dice <- sample(die, size = 2, replace = TRUE)
@@ -232,7 +232,7 @@ dice
 sum(dice)
 ```
 
-Confirm that calling dice won't rerun sample(die, 2, replace = TRUE):
+Confirm that calling dice won't rerun `sample(die, 2, replace = TRUE)`:
 
 ```{r}
 dice
@@ -243,7 +243,7 @@ However, you *can* create an object that will re-roll the dice whenever you call
 
 ### Writing your own functions
 
-We will write a function 'roll()', that will return the sum of rolling two dice:
+We will write a function `roll()`, that will return the sum of rolling two dice:
 
 ```{r}
 roll <- function() { # this line contains the function name (roll) and the parentheses contain the argument (here, there are none)
@@ -277,7 +277,7 @@ a <- sqrt(2)
 
 ### Arguments
 
-What would happen if we changed our roll() function to this?
+What would happen if we changed our `roll()` function to this?
 
 ```{r}
 # roll2 <- function() {
@@ -288,9 +288,9 @@ What would happen if we changed our roll() function to this?
 # roll2()
 ```
 
-If you remove the # signs, it produces an error because the object 'bones' cannot be found by the function.
+If you remove the # signs, it produces an error because the object `bones` cannot be found by the function.
 
-To supply 'bones', put the object name bones as an argument in the parentheses that follow the function:
+To supply `bones`, put the object name bones as an argument in the parentheses that follow the function:
 
 ```{r}
 roll2 <- function(bones) {
@@ -299,19 +299,19 @@ roll2 <- function(bones) {
 }
 ```
 
-Now roll2() will work as long as you provide a value or values for 'bones' each time you call it:
+Now `roll2()` will work as long as you provide a value or values for `bones` each time you call it:
 
 ```{r}
 roll2(bones = 1:6)
 ```
 
-Because there is only one argument, 'bones', we do not need to name it for R to match the values:
+Because there is only one argument, `bones`, we do not need to name it for R to match the values:
 
 ```{r}
 roll2(1:6)
 ```
 
-roll2() will still give an error if you do not supply 'bones' at all. You can prevent this by assigning a default value when writing the function:
+roll2() will still give an error if you do not supply `bones` at all. You can prevent this by assigning a default value when writing the function:
 
 ```{r}
 roll2 <- function(bones = 1:6) {
@@ -330,7 +330,7 @@ You can give your functions as many arguments as you like, just list their names
 
 If you are working in the script window of RStudio you can create a function from lines of code using the drop-down menu option **Code > Extract Function**.
 
-Test it out with the three lines of code from the body of code in our roll() function:
+Test it out with the three lines of code from the body of code in our `roll()` function:
 
 ```{r}
 die <- 1:6
@@ -358,3 +358,12 @@ You should now have a familiarity with:
  - Extracting a function in RStudio
  
 **Great work, you've finished Chapter 1!**
+
+$~$
+
+## Chapter 2: Packages and Help Pages
+
+Packages are collections of functions and objects made by professors, programmers, statisticians, and other R users.
+
+We will try using the `qplot` function
+
