@@ -186,6 +186,29 @@ sample(size = 1, x = die)
 
 ### Sample with replacement
 
+By setting the argument size to 2, we can almost simulate the rolling of a pair of dice:
+
+```{r}
+sample(die, size = 2)
+```
+
+**Almost** like two dice, because if you repeat it many times, you will see that it never selects the same number twice:
+```{r}
+sample(die, size = 2) 
+sample(die, size = 2)  
+sample(die, size = 2)  
+```
+
+In other words, it samples *without* replacement.
+
+We need to sample *with* replacement, using the argument replace = TRUE:
+
+```{r}
+sample(die, size = 2, replace = TRUE) 
+```
+
+Sampling with replacement is an easy way to create independent random samples.
+
 ### Writing your own functions
 
 ### Arguments
