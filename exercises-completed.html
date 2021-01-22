@@ -418,41 +418,41 @@ a + 2</code></pre>
 die &lt;- 1:6
 die</code></pre>
 <pre><code>## [1] 1 2 3 4 5 6</code></pre>
-<pre class="r"><code># R also understands capitalization in object names
-Name &lt;- 1
+<p>R also understands capitalization in object names</p>
+<pre class="r"><code>Name &lt;- 1
 name &lt;- 0
 
 name + 1</code></pre>
 <pre><code>## [1] 1</code></pre>
-<pre class="r"><code># R overwrites previous information without asking permission
-my_number &lt;- 1
+<p>R overwrites previous information without asking permission</p>
+<pre class="r"><code>my_number &lt;- 1
 my_number</code></pre>
 <pre><code>## [1] 1</code></pre>
 <pre class="r"><code>my_number &lt;- 999
 my_number</code></pre>
 <pre><code>## [1] 999</code></pre>
-<pre class="r"><code># look at all the objects you have created using &#39;ls()&#39;
-ls()</code></pre>
+<p>Look at all the objects you have created using ‘ls()’</p>
+<pre class="r"><code>ls()</code></pre>
 <pre><code>## [1] &quot;a&quot;         &quot;die&quot;       &quot;my_number&quot; &quot;name&quot;      &quot;Name&quot;</code></pre>
-<pre class="r"><code># you can clear all your work space objects using (remove the # first)
-# rm(list=ls())</code></pre>
-<pre class="r"><code># you can do all sorts of math with die (a sequence of numeric integers)
-die - 1</code></pre>
+<p>You can clear all your work space objects using (remove the # first)</p>
+<pre class="r"><code># rm(list=ls())</code></pre>
+<p>You can do all sorts of math with die (a sequence of numeric integers)</p>
+<pre class="r"><code>die - 1</code></pre>
 <pre><code>## [1] 0 1 2 3 4 5</code></pre>
 <pre class="r"><code>die / 2</code></pre>
 <pre><code>## [1] 0.5 1.0 1.5 2.0 2.5 3.0</code></pre>
 <pre class="r"><code>die * die</code></pre>
 <pre><code>## [1]  1  4  9 16 25 36</code></pre>
-<pre class="r"><code># when you multiply two vectors of unequal length, R will repeat the shorter vector to match the long vector (known as &#39;vector recycling&#39;)
-die + 1:2</code></pre>
+<p>When you multiply two vectors of unequal length, R will repeat the shorter vector to match the long vector (known as ‘vector recycling’)</p>
+<pre class="r"><code>die + 1:2</code></pre>
 <pre><code>## [1] 2 4 4 6 6 8</code></pre>
-<pre class="r"><code># but it will produce an error when the longer objeect is not a multiple of the shorter object
-die + 1:4</code></pre>
+<p>But it will produce an error when the longer objeect is not a multiple of the shorter object</p>
+<pre class="r"><code>die + 1:4</code></pre>
 <pre><code>## Warning in die + 1:4: longer object length is not a multiple of shorter object
 ## length</code></pre>
 <pre><code>## [1] 2 4 6 8 6 8</code></pre>
-<pre class="r"><code># you can also do matrix multiplication
-die %*% die # inner</code></pre>
+<p>You can also do matrix multiplication</p>
+<pre class="r"><code>die %*% die # inner</code></pre>
 <pre><code>##      [,1]
 ## [1,]   91</code></pre>
 <pre class="r"><code>die %o% die # outer</code></pre>

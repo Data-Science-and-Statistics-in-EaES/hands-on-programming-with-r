@@ -51,16 +51,18 @@ die <- 1:6
 die
 ```
 
+R also understands capitalization in object names
+
 ```{r}
-# R also understands capitalization in object names
 Name <- 1
 name <- 0
 
 name + 1
 ```
 
+R overwrites previous information without asking permission
+
 ```{r}
-# R overwrites previous information without asking permission
 my_number <- 1
 my_number
 
@@ -68,33 +70,42 @@ my_number <- 999
 my_number
 ```
 
+Look at all the objects you have created using 'ls()'
 ```{r}
-# look at all the objects you have created using 'ls()'
 ls()
 ```
 
+You can clear all your work space objects using (remove the # first)
+
 ```{r}
-# you can clear all your work space objects using (remove the # first)
 # rm(list=ls())
 ```
 
+
+You can do all sorts of math with die (a sequence of numeric integers)
+
 ```{r}
-# you can do all sorts of math with die (a sequence of numeric integers)
 die - 1
 die / 2
 die * die
 ```
 
-```{r}
-# when you multiply two vectors of unequal length, R will repeat the shorter vector to match the long vector (known as 'vector recycling')
-die + 1:2
+When you multiply two vectors of unequal length, R will repeat the shorter vector to match the long vector (known as 'vector recycling')
 
-# but it will produce an error when the longer objeect is not a multiple of the shorter object
+```{r}
+die + 1:2
+```
+
+
+But it will produce an error when the longer objeect is not a multiple of the shorter object
+
+```{r}
 die + 1:4
 ```
 
+You can also do matrix multiplication
+
 ```{r}
-# you can also do matrix multiplication
 die %*% die # inner
 die %o% die # outer
 ```
