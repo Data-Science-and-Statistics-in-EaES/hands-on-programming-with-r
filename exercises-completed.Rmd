@@ -112,6 +112,78 @@ die %o% die # outer
 
 ### Functions
 
+To use a function, just write the name of the function and then the data you want to operate on in the parentheses:
+
+```{r}
+round(3.1415)
+factorial(3)
+```
+
+The data you pass the function is called the function's 'argument'. The argument can be:
+
+```{r}
+mean(1:6) # raw data
+mean(die) # an R object
+round(mean(die)) # of even the result of another function
+```
+
+You can "roll" the dice using the sample function, with arguments 'x' (vector/data) and 'size' (number of elements to sample):
+
+```{r}
+sample(x = 1:6, size = 2)
+```
+
+Roll your die by setting x to 'die' and sample 1 number from it:
+
+```{r}
+sample(x = die, size = 1)
+
+```
+
+Roll it again:
+
+```{r}
+sample(x = die, size = 1)
+```
+
+R doesn't require arguments to be named, for example:
+
+```{r}
+sample(die, 1)
+```
+
+And if you use the wrong argument names, you will get an error:
+
+```{r}
+# round(3.1415, corners = 2) # running this without the # sign will cause an error
+# this is because the function round() does not use the argument 'corners'
+```
+
+You can look up the function's arguments with 'args':
+
+```{r}
+args(round) 
+# the output shows that the digits argument has a default value of zero, which rounds to the nearest integer
+```
+
+You can change the default value by assigning a new value to the digits argument:
+
+```{r}
+round(3.1415, digits = 2)
+```
+
+If you do not write argument names (which is recommended for any arguments after the first 2) then R matches values using the order:
+
+```{r}
+sample(die, 1) # here, R automatically matches the value 1 to the argument 'size'
+```
+
+If you name all your arguments, R doesn't care if you enter them in the non-standard order:
+
+```{r}
+sample(size = 1, x = die) 
+```
+
 ### Sample with replacement
 
 ### Writing your own functions
