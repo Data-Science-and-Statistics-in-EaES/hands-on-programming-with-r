@@ -363,7 +363,145 @@ $~$
 
 ## Chapter 2: Packages and Help Pages
 
+In this chapter we will cover:
+
+ - Installing a package
+ - Loading a package from your library of packages
+ - Plotting using the function `qplot` from the `ggplot` package
+ - Using help pages
+
+### Packages
+
 Packages are collections of functions and objects made by professors, programmers, statisticians, and other R users.
 
-We will try using the `qplot` function
+We will try using the `qplot` function which comes from the *ggplot2* package, a popular package for making graphs.
+
+First, install the package with the following function:
+
+```{r}
+install.packages("ggplot2")
+```
+
+`qplot` won't work without loading it:
+
+```{r}
+# qplot
+# will give an error if you remove the # sign
+```
+
+To load an installed package use:
+
+```{r}
+library("ggplot2")
+```
+
+And look at `qplot`:
+
+```{r}
+qplot
+```
+
+`qplot` makes "quick plots". Let's test it out by defining some x and y values:
+
+```{r}
+x <- c(-1, -0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8, 1)
+x
+```
+
+```{r}
+y <- c(x^3)
+y
+```
+
+```{r}
+qplot(x, y)
+```
+
+Notice how R matches the order of values in the vector `x` with the order of values in vector `y`? 
+
+This is known as *element-wise execution*.
+
+We can also make a histogram by just providing one vector of values:
+
+```{r}
+x <- c(1, 2, 2, 2, 3, 3)
+qplot(x, binwidth = 1)
+```
+
+The notation for describing this histogram intervals looks like: `[1, 2)`
+The hard bracket `[` means the first number is included in the interval.
+The parenthesis `)` means the last number is *not* included.
+
+For example, in the histogram above, there are three values in the interval `[2, 3)`.
+
+Let's try another example:
+
+```{r}
+x2 <- c(1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4)
+qplot(x2, binwidth = 1)
+```
+
+And another:
+
+```{r}
+x3 <- c(0, 1, 1, 2, 2, 2, 3, 3, 4)
+qplot(x3, binwidth = 1)
+```
+
+You can use a histogram to display visually how common different values of `x` are.
+
+Let's try visualizing many the *replicated* output of `roll()` (many dice rolls):
+
+```{r}
+replicate(3, 1 + 1)
+```
+
+```{r}
+rolls <- replicate(10, roll())
+qplot(rolls, binwidth = 1)
+```
+
+To get a better sense of the long term  pattern, let's replicate it 10,000 times:
+
+```{r}
+rolls <- replicate(10000, roll())
+qplot(rolls, binwidth = 1)
+```
+
+The histogram shows that the dice behaves predictably when replicated many times. The more likely values occur more frequently (e.g., 6, 7, and 8)
+
+
+### Help Pages
+
+Use a question mark `?` before a function name to open the help page:
+
+```{r}
+?sqrt
+?log10
+?sample
+```
+
+The help page has several sections:
+
+ - *Description*
+ - *Usage*
+ - *Arguments*
+ - *Details*
+ - *Value*
+ - *See Also*
+ - *Examples*
+ 
+You can also search by keyword if you forget a function name:"
+
+```{r}
+??log
+```
+
+Let's look at the `sample` help page:
+
+```{r}
+?sample
+```
+
+You'll have to copy and paste `?sample` into your RStudio console window, or run it from the script window.
 
