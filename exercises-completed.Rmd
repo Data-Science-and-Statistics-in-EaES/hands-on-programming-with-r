@@ -192,7 +192,7 @@ By setting the argument size to 2, we can almost simulate the rolling of a pair 
 sample(die, size = 2)
 ```
 
-**Almost** like two dice, because if you repeat it many times, you will see that it never selects the same number twice:
+*Almost* like two dice, because if you repeat it many times, you will see that it never selects the same number twice:
 ```{r}
 sample(die, size = 2) 
 sample(die, size = 2)  
@@ -208,6 +208,26 @@ sample(die, size = 2, replace = TRUE)
 ```
 
 Sampling with replacement is an easy way to create independent random samples.
+
+
+### Congratulations, you can now simulate rolling a pair of dice!
+
+You can also add up the result of your simulated dice throw if you save the output to the object 'dice', then use the function sum() on dice:
+
+```{r}
+dice <- sample(die, size = 2, replace = TRUE)
+dice
+sum(dice)
+```
+
+Confirm that calling dice won't rerun sample(die, 2, replace = TRUE):
+
+```{r}
+dice
+dice # it gives the same result as originally output 
+```
+
+However, you *can* create an object that will re-roll the dice whenever you call it. In R, these are called **Functions**.
 
 ### Writing your own functions
 
