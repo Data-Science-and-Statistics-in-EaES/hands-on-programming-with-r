@@ -231,6 +231,38 @@ However, you *can* create an object that will re-roll the dice whenever you call
 
 ### Writing your own functions
 
+We will write a function 'roll()', that will return the sum of rolling two dice:
+
+```{r}
+roll <- function() { # this line contains the function name (roll) and the parentheses contain the argument (here, there are none)
+  die <- 1:6
+  dice <- sample(die, size = 2, replace = TRUE)
+  sum(dice) # these three lines within the pair of braces contain the function's body of code. The indentations are only for clarity.
+}
+```
+
+R returns the last line of the body of code within the function, so make sure the final line of code returns a value:
+
+```{r}
+roll()
+```
+
+For instance, these lines of code as the final line will return a value:
+
+```{r}
+dice
+1 + 1
+sqrt(2)
+```
+
+But these lines will not:
+
+```{r}
+dice <- sample(die, size = 2, replace = TRUE)
+two <- 1 + 1
+a <- sqrt(2)
+```
+
 ### Arguments
 
 ### Extract Function in RStudio
