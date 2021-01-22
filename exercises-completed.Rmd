@@ -265,4 +265,53 @@ a <- sqrt(2)
 
 ### Arguments
 
+What would happen if we changed our roll() function to this?
+
+```{r}
+# roll2 <- function() {
+#   dice <- sample(bones, size = 2, replace = TRUE)
+#   sum(dice)
+# }
+# 
+# roll2()
+```
+
+If you remove the # signs, it produces an error because the object 'bones' cannot be found by the function.
+
+To supply 'bones', put the object name bones as an argument in the parentheses that follow the function:
+
+```{r}
+roll2 <- function(bones) {
+  dice <- sample(bones, size = 2, replace = TRUE)
+  sum(dice)
+}
+```
+
+Now roll2() will work as long as you provide a value or values for 'bones' each time you call it:
+
+```{r}
+roll2(bones = 1:6)
+```
+
+Because there is only one argument, 'bones', we do not need to name it for R to match the values:
+
+```{r}
+roll2(1:6)
+```
+
+roll2() will still give an error if you do not supply 'bones' at all. You can prevent this by assigning a default value when writing the function:
+
+```{r}
+roll2 <- function(bones = 1:6) {
+  dice <- sample(bones, size = 2, replace = TRUE)
+  sum(dice)
+}
+```
+
+```{r}
+roll2()
+```
+
+You can give your functions as many arguments as you like, just list their names, separated by a comma.
+
 ### Extract Function in RStudio

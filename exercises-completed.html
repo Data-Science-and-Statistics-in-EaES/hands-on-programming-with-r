@@ -480,16 +480,16 @@ my_number</code></pre>
 <pre><code>## [1] 4</code></pre>
 <p>You can “roll” the dice using the sample function, with arguments ‘x’ (vector/data) and ‘size’ (number of elements to sample):</p>
 <pre class="r"><code>sample(x = 1:6, size = 2)</code></pre>
-<pre><code>## [1] 1 6</code></pre>
+<pre><code>## [1] 5 3</code></pre>
 <p>Roll your die by setting x to ‘die’ and sample 1 number from it:</p>
 <pre class="r"><code>sample(x = die, size = 1)</code></pre>
-<pre><code>## [1] 5</code></pre>
+<pre><code>## [1] 2</code></pre>
 <p>Roll it again:</p>
 <pre class="r"><code>sample(x = die, size = 1)</code></pre>
-<pre><code>## [1] 2</code></pre>
+<pre><code>## [1] 5</code></pre>
 <p>R doesn’t require arguments to be named, for example:</p>
 <pre class="r"><code>sample(die, 1)</code></pre>
-<pre><code>## [1] 6</code></pre>
+<pre><code>## [1] 5</code></pre>
 <p>And if you use the wrong argument names, you will get an error:</p>
 <pre class="r"><code># round(3.1415, corners = 2) # running this without the # sign will cause an error
 # this is because the function round() does not use the argument &#39;corners&#39;</code></pre>
@@ -512,18 +512,18 @@ my_number</code></pre>
 <h3>Sample with replacement</h3>
 <p>By setting the argument size to 2, we can almost simulate the rolling of a pair of dice:</p>
 <pre class="r"><code>sample(die, size = 2)</code></pre>
-<pre><code>## [1] 2 3</code></pre>
+<pre><code>## [1] 3 6</code></pre>
 <p><em>Almost</em> like two dice, because if you repeat it many times, you will see that it never selects the same number twice:</p>
 <pre class="r"><code>sample(die, size = 2) </code></pre>
-<pre><code>## [1] 2 6</code></pre>
+<pre><code>## [1] 2 3</code></pre>
 <pre class="r"><code>sample(die, size = 2)  </code></pre>
-<pre><code>## [1] 5 6</code></pre>
+<pre><code>## [1] 3 4</code></pre>
 <pre class="r"><code>sample(die, size = 2)  </code></pre>
-<pre><code>## [1] 2 1</code></pre>
+<pre><code>## [1] 5 2</code></pre>
 <p>In other words, it samples <em>without</em> replacement.</p>
 <p>We need to sample <em>with</em> replacement, using the argument replace = TRUE:</p>
 <pre class="r"><code>sample(die, size = 2, replace = TRUE) </code></pre>
-<pre><code>## [1] 1 4</code></pre>
+<pre><code>## [1] 4 2</code></pre>
 <p>Sampling with replacement is an easy way to create independent random samples.</p>
 </div>
 <div id="congratulations-you-can-now-simulate-rolling-a-pair-of-dice" class="section level3">
@@ -531,14 +531,14 @@ my_number</code></pre>
 <p>You can also add up the result of your simulated dice throw if you save the output to the object ‘dice’, then use the function sum() on dice:</p>
 <pre class="r"><code>dice &lt;- sample(die, size = 2, replace = TRUE)
 dice</code></pre>
-<pre><code>## [1] 1 6</code></pre>
+<pre><code>## [1] 5 4</code></pre>
 <pre class="r"><code>sum(dice)</code></pre>
-<pre><code>## [1] 7</code></pre>
+<pre><code>## [1] 9</code></pre>
 <p>Confirm that calling dice won’t rerun sample(die, 2, replace = TRUE):</p>
 <pre class="r"><code>dice</code></pre>
-<pre><code>## [1] 1 6</code></pre>
+<pre><code>## [1] 5 4</code></pre>
 <pre class="r"><code>dice # it gives the same result as originally output </code></pre>
-<pre><code>## [1] 1 6</code></pre>
+<pre><code>## [1] 5 4</code></pre>
 <p>However, you <em>can</em> create an object that will re-roll the dice whenever you call it. In R, these are called <strong>Functions</strong>.</p>
 </div>
 <div id="writing-your-own-functions" class="section level3">
@@ -551,10 +551,10 @@ dice</code></pre>
 }</code></pre>
 <p>R returns the last line of the body of code within the function, so make sure the final line of code returns a value:</p>
 <pre class="r"><code>roll()</code></pre>
-<pre><code>## [1] 4</code></pre>
+<pre><code>## [1] 12</code></pre>
 <p>For instance, these lines of code as the final line will return a value:</p>
 <pre class="r"><code>dice</code></pre>
-<pre><code>## [1] 1 6</code></pre>
+<pre><code>## [1] 5 4</code></pre>
 <pre class="r"><code>1 + 1</code></pre>
 <pre><code>## [1] 2</code></pre>
 <pre class="r"><code>sqrt(2)</code></pre>
@@ -566,6 +566,33 @@ a &lt;- sqrt(2)</code></pre>
 </div>
 <div id="arguments" class="section level3">
 <h3>Arguments</h3>
+<p>What would happen if we changed our roll() function to this?</p>
+<pre class="r"><code># roll2 &lt;- function() {
+#   dice &lt;- sample(bones, size = 2, replace = TRUE)
+#   sum(dice)
+# }
+# 
+# roll2()</code></pre>
+<p>If you remove the # signs, it produces an error because the object ‘bones’ cannot be found by the function.</p>
+<p>To supply ‘bones’, put the object name bones as an argument in the parentheses that follow the function:</p>
+<pre class="r"><code>roll2 &lt;- function(bones) {
+  dice &lt;- sample(bones, size = 2, replace = TRUE)
+  sum(dice)
+}</code></pre>
+<p>Now roll2() will work as long as you provide a value or values for ‘bones’ each time you call it:</p>
+<pre class="r"><code>roll2(bones = 1:6)</code></pre>
+<pre><code>## [1] 5</code></pre>
+<p>Because there is only one argument, ‘bones’, we do not need to name it for R to match the values:</p>
+<pre class="r"><code>roll2(1:6)</code></pre>
+<pre><code>## [1] 5</code></pre>
+<p>roll2() will still give an error if you do not supply ‘bones’ at all. You can prevent this by assigning a default value when writing the function:</p>
+<pre class="r"><code>roll2 &lt;- function(bones = 1:6) {
+  dice &lt;- sample(bones, size = 2, replace = TRUE)
+  sum(dice)
+}</code></pre>
+<pre class="r"><code>roll2()</code></pre>
+<pre><code>## [1] 3</code></pre>
+<p>You can give your functions as many arguments as you like, just list their names, separated by a comma.</p>
 </div>
 <div id="extract-function-in-rstudio" class="section level3">
 <h3>Extract Function in RStudio</h3>
