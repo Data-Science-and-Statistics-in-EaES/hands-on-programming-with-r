@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+$~$
+
 ## Introduction
 
 ### Acknowledgement
@@ -28,9 +30,20 @@ But also, to:
 
 ### Getting Started with R
 
-Although I highly recommend the use of [RStudio Cloud](https://rstudio.cloud/), the textbook *Hands-On Programming with R* also features a handy [Appendix](https://rstudio-education.github.io/hopr/starting.html) to guide you through setting up R and RStudio IDE (Integrated Development Environment) on your local computer.
+Although I highly recommend the use of [RStudio Cloud](https://rstudio.cloud/), the textbook *Hands-On Programming with R* also features a handy [Appendix](https://rstudio-education.github.io/hopr/starting.html) to guide you through setting up R and RStudio IDE (Integrated Development Environment) on your local computer. 
+
+$~$
 
 ## Chapter 1
+
+In this chapter we will cover:
+
+ - Objects
+ - Functions
+ - Sampling with and without replacement
+ - Writing your own functions
+ - Function arguments
+ - Extracting a function in RStudio
 
 ### Objects
 
@@ -209,8 +222,7 @@ sample(die, size = 2, replace = TRUE)
 
 Sampling with replacement is an easy way to create independent random samples.
 
-
-### Congratulations, you can now simulate rolling a pair of dice!
+**Congratulations, you can now simulate rolling a pair of dice!**
 
 You can also add up the result of your simulated dice throw if you save the output to the object 'dice', then use the function sum() on dice:
 
@@ -315,3 +327,34 @@ roll2()
 You can give your functions as many arguments as you like, just list their names, separated by a comma.
 
 ### Extract Function in RStudio
+
+If you are working in the script window of RStudio you can create a function from lines of code using the drop-down menu option **Code > Extract Function**.
+
+Test it out with the three lines of code from the body of code in our roll() function:
+
+```{r}
+die <- 1:6
+dice <- sample(die, size = 2, replace = TRUE)
+sum(dice)
+```
+
+After you've done it, your code should update to look like this:
+
+```{r}
+roll <- function() {
+  die <- 1:6
+  dice <- sample(die, size = 2, replace = TRUE)
+  sum(dice)
+}
+```
+
+You should now have a familiarity with:
+
+ - Objects
+ - Functions
+ - Sampling with and without replacement
+ - Writing your own functions
+ - Function arguments
+ - Extracting a function in RStudio
+ 
+**Great work, you've finished Chapter 1!**
