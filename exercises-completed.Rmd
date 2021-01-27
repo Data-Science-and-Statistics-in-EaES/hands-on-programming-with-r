@@ -527,8 +527,10 @@ Rerun the code chunk above, and then visualize the long term behavior of your di
 
 ```{r}
 rolls <- replicate(10000, roll())
-qplot(rolls, binwidth)
+qplot(rolls, binwidth = 1)
 ```
+
+Notice that after changing the `prob` vector to make 6 more common, the distribution of dice roll outcomes is now skewed.
 
 You should now have a familiarity with:
 
@@ -541,5 +543,241 @@ You should now have a familiarity with:
 
 $~$
 
+## Chapter 3: R Objects
 
+In this chapter we will cover:
+
+ 1. Objects
+     + Atomic Vectors
+     + Doubles
+     + Integers
+     + Characters
+     + Logicals
+     + Complex and Raw
+ 2. Attributes 
+     + Names
+     + Dim
+ 3. Matrices
+ 4. Arrays
+ 5. Class
+     + Dates and Times
+     + Factors
+ 6. Coercion
+ 7. Lists
+ 8. Data Frames
+ 9. Loading Data
+ 10. Saving Data
+
+### Objects
+#### Atomic Vectors
+
+Create an atomic vector by grouping values with c (concatenate)
+
+```{r}
+die <- c(1, 2, 3, 4, 5, 6)
+die
+is.vector(die)
+```
+
+Vectors can be of just one value
+
+```{r}
+five <- 5
+is.vector(five)
+```
+
+There are 6 types of atomic vectors in R:
+
+ 1. *Doubles* are the default for numbers and are the computer science term for numerics:
+
+```{r}
+typeof(die)
+```
+
+
+ 2. *Integers* store numbers without decimal points. Adding an L after a numeric value creates an integer:
+ 
+```{r}
+int <- c(-1L, 2L, 4L)
+int
+typeof(int)
+```
+
+By default, integer numbers saved without the L will be saved as double.
+
+Double values are accurate to about 16 significant digits. This rounding is normally negligible, but can create *floating-point errors* when rounding effects add up.
+
+ 3. *Character vectors* store small pieces of text:
+ 
+```{r}
+text <- c("Hello", "World")
+text
+typeof(text)
+```
+
+The individual elements of a character vector are known as strings. Can you tell the difference between a character string and a number?
+
+```{r}
+typeof(1)
+typeof("1")
+typeof("one")
+```
+
+Be careful, you can confuse R objects with strings, for example:
+
+```{r}
+x <- "x"
+x
+```
+
+ 4. *Logicals* are TRUE, FALSE, T, and F are R's version of logical (Boolean) data:
+ 
+```{r}
+logic <- c(TRUE, TRUE, FALSE)
+logic
+typeof(logic)
+typeof(T)
+```
+ 
+ 5. *Complex*. It is unlikely you will ever use these last two vector types but... for a complex vector, add an imaginary term to a number, with i:
+ 
+```{r}
+comp <- c(1 + 1i, 1 + 2i, 1 + 3i)
+comp
+typeof(comp)
+```
+ 
+ 6. *Raw* vectors store raw bytes of data. A simple empty raw vector of length n can be made with:
+ 
+```{r}
+raw(3)
+typeof(raw(3))
+```
+
+**Exercise**: What sort of vector will you use to store the face names of cards in a royal flush? ( i.e. "ace", "king", "queen", "jack", "ten )
+
+```{r}
+hand <- c("ace", "king", "queen", "jack", "ten")
+hand
+typeof(hand)
+```
+
+#### Attributes
+
+You can build a more sophisticated objects vector from an atomic vector by giving it *attributes* and assigning a *class*.
+
+An *attribute* is a piece of information you can attach to atomic vectors (or any R object). Normally, R will ignore this information, unless you ask to look for it
+
+```{r}
+attributes(die)
+```
+
+R uses NULL to represent an empty object.
+
+*Names*, *dimensions* (*dim*), and *classes* are the most common attributes.
+
+*Names*
+
+```{r}
+names(die)
+names(die) <- c("one", "two", "three", "four", "five", "six")
+names(die)
+attributes(die)
+```
+
+Now die has the names attribute.
+
+Names will be displayed above the object when you look at it:
+
+```{r}
+die
+```
+
+
+However they won't affect the values of the vector:
+
+```{r}
+die + 1
+names(die) <- c("uno", "dos", "tres", "cuatro", "cinco", "seis")
+die
+```
+
+To remove names, set it to NULL:
+
+```{r}
+names(die) <- NULL
+```
+
+*Dimensions*
+You can transform an atomic vector into an n-dimensional array with dim:
+
+```{r}
+dim(die)
+```
+
+Transform it into a (2 row x 3 column) array:
+
+```{r}
+dim(die) <- c(2, 3)
+die
+```
+
+Now into a (3 row x 2 column) array:
+
+```{r}
+dim(die) <- c(3, 2)
+die    
+```
+
+Now into a (1 row x 2 column x 3 slice) hypercube (a 3 dimensional structure):
+
+```{r}
+dim(die) <- c(1, 2, 3)
+die
+```
+
+Two notes on dim
+
+ * R will always use the first value of dim for the rows, and second for columns
+ * R will always fill the array by columns (all rows in column 1 first, and so on
+
+*Matrices* store two-dimensional arrays. A matrix will organize your vector of values into a matrix with the specified number of rows:
+
+```{r}
+m <- matrix(die, nrow = 2)
+m
+```
+
+To fill by row (rather than default by column):
+
+```{r}
+m <- matrix(die, nrow = 2, byrow = TRUE)
+m
+```
+
+More customization is possible, remember to check the help page with:
+
+```{r}
+?matrix
+```
+
+*Arrays* create an n-dimensional array, for example a hypercube in 4, 5, or n dimensions:
+
+```{r}
+ar <- array(c(11:14, 21:24, 31:34), dim = c(2, 2, 3))
+ar
+```
+
+**Exercise**: Create a 5 x 2 matrix for a royal flush of spades. (Remember the hand object created earlier)
+
+```{r}
+hand1 <- c(hand, "spades", "spades", "spades", "spades", "spades")
+
+matrix(hand1, nrow = 5)
+matrix(hand1 , ncol = 2)
+dim(hand1) <- c(5, 2)
+hand1
+```
+
+Notice that all three of these options for arranging the array dimensions work.
 
