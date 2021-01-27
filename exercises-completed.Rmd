@@ -505,3 +505,41 @@ Let's look at the `sample` help page:
 
 You'll have to copy and paste `?sample` into your RStudio console window, or run it from the script window.
 
+Notice `prob`:
+
+|   `A vector of probability weights for obtaining the elemtents of the vector being sampled.`
+
+And Details has more information:
+|   `The optional prob argument can be used to give a vector of weights for obtaining the elements of the vector being sampled. They need not sum to one, but they should be nonnegative and not all zero`
+
+Re-write the `roll` function to roll a pair of weighted dice:
+
+```{r}
+roll <- function() {
+  die <- 1:6
+  dice <- sample(die, size = 2, replace = T, 
+                 prob = c(rep(1/8, 5), 3/8))
+  sum(dice)
+}
+```
+
+Rerun the code chunk above, and then visualize the long term behavior of your dice:
+
+```{r}
+rolls <- replicate(10000, roll())
+qplot(rolls, binwidth)
+```
+
+You should now have a familiarity with:
+
+ - Installing a package
+ - Loading a package from your library of packages
+ - Plotting using the function `qplot` from the `ggplot` package
+ - Using help pages
+ 
+**Great job, you've finished Chapter 2!**
+
+$~$
+
+
+
