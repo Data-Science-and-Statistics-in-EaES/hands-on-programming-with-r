@@ -781,3 +781,272 @@ hand1
 
 Notice that all three of these options for arranging the array dimensions work.
 
+#### Class
+Notice that changing `dim` doesn't change the type, but does change the class:
+
+```{r}
+dim(die) <- c(2, 3)
+typeof(die)
+class(die)
+```
+
+A class is a special case of an atomic vector. After using dim, die is now a matrix (class), a special case of a double atomic vector. The class attribute may not always appear if you run attributes:
+
+```{r}
+attributes(die)
+```
+
+Even if a class attribute is not assigned, R will return one based on the atomic vector type:
+
+```{r}
+class("Hello")
+class(5)
+```
+
+Setting an object's class attribute is normally a bad idea. Discussed more in Part 3 of the book!
+
+#### Dates and Times
+
+Attributes let R represent more types of data than just doubles, integers, characters, etc.
+R uses the "POSIXct" and "POSIXt" classes for dates and times:
+
+```{r}
+Sys.time() # a function to return the current time on your computer
+now <- Sys.time()
+now
+```
+
+It looks like  a character string, but it's data type is actually double:
+
+```{r}
+typeof(now)
+class(now)
+```
+
+In POSIXct, a widely used framework, any date and time is represented by the number of seconds before or after the standard date and time:
+
+E.g., 12:00 AM January 1st 1970 (in the Universal Time Coordinated (UTC) zone)
+
+Check using the unclasss function:
+
+```{r}
+unclass(now)
+```
+
+Check what day it was a million seconds after the standard date and time:
+
+```{r}
+mil <- 1000000
+mil
+```
+
+And look at the class:
+
+```{r}
+class(mil) <- c("POSIXct", "POSIXt")
+mil
+```
+
+This worked well, but in general forcing a class on an object is not a good idea. Classes are normally interpreted by R based upon the value type in the object.
+
+#### Factors
+Factors are how R stores categorical information, like eye color or ethnicity. To make a factor, pass an atomic vector to the factor function:
+
+```{r}
+gender <- factor(c("male", "female", "female", "male"))
+gender
+typeof(gender)
+```
+
+Notice that R stores the factor as type integer, this is because it assigns factors levels:
+
+```{r}
+attributes(gender)
+```
+
+You can see exactly how R is storing your factor with unclass:
+
+```{r}
+unclass(gender)
+```
+
+Factors can be confusing because they look like characters but behave like integers. 
+
+R will often try to convert character strings to factors when you load and create data but how to avoid this will be covered later.
+
+```{r}
+as.character(gender)
+```
+
+Congrats! You now understand all the possibilities of R's atomic vectors!
+
+#### Coercion
+
+Try creating an atomic vector with two value types:
+
+```{r}
+card <- c("ace", "hearts", 1)
+card
+```
+
+Notice the integer 1, is now a character string? R has *coerced* it into a character string because atomic vectors, and their special cases, matrices and arrays, can only store ONE type of data:
+
+**Coercion rules**:
+
+If a character string is present, R coerces everything to character strings:
+
+```{r}
+c(1, 2, 3, "4")
+```
+
+If logicals and numbers, R coerces everything to numbers (T = 1, F = 0):
+
+```{r}
+c(TRUE, 5, 5, FALSE)
+```
+
+If you try to do math with logical values, it will count the number of TRUEs:
+
+```{r}
+sum(c(TRUE, TRUE, FALSE, FALSE))
+```
+
+To explicitly convert between data types:
+
+```{r}
+as.character(1)
+as.logical(1)
+as.numeric(FALSE)
+```
+
+#### Lists
+
+To completely avoid coercion, you can use lists:
+
+```{r}
+list1 <- list(100:130, "R", list(TRUE, FALSE))
+list1
+```
+
+The double bracket index tells you which element of the list is displayed:
+
+```{r}
+list1[[2]]
+```
+
+The single bracket tells you which subselement of the list is displayed:
+
+```{r}
+list1[[1]][3]
+```
+
+This distinction is important because a list object can be anything, including another list:
+
+```{r}
+list1[[3]]
+
+# Is composed of...
+
+list1[[3]][[1]]
+list1[[3]][[2]]
+```
+
+Use a list to store a single playing card, such as the ace of hearts, worth one point:
+
+```{r}
+card <- list("ace", "hearts", 1)
+card
+```
+
+You could use lists to create a list, with 52 sublists, for all the differen cards but there is a faster way!
+
+#### Data Frames
+
+Data frames are the two-dimensional version of a list and by FAR the most useful storage structure for data analysis, and perfect for a deck of cards. (You can think of a data frame as the equivalent of an Excel spreadsheet)
+
+Give the data.frame() function any number of vectors, separated by a comma. Each vector should be set equal to a name that describes the vector:
+
+```{r}
+df <- data.frame(face = c("ace", "two", "six"),
+                 suit = c("clubs", "clubs", "clubs"),
+                 value = c(1, 2, 3))
+df
+```
+
+Note that df columns have to be of the same length. A data.frame is of special case of a list, of class "data frame":
+
+```{r}
+typeof(df)
+class(df)
+```
+
+The `str` function shows you which and how objects are grouped together:
+
+```{r}
+str(df)
+```
+
+Notice R saved the strings as factor, you can suppress this with:
+
+```{r}
+df <- data.frame(face = c("ace", "two", "six"),
+                 suit = c("clubs", "clubs", "clubs"),
+                 value = c(1, 2, 3), 
+                 stringsAsFactors = FALSE)
+str(df)
+```
+
+We could not type out all 52 card combinations, but it is easier to load data and safer for your data, and wrists.
+
+#### Loading Data
+
+Plain text files are the typical data storage type in R (and other data sci. applications).
+
+Go to http://bit.ly/deck_CSV to download the card deck file and take a look inside the .csv file.
+
+Go to the top-left window: Environment > Import Data > From Text File... > Select deck.csv > Open > Import.
+
+Look at the top and bottom of the data frame with:
+
+```{r}
+deck <- read.csv("deck.csv") # this line is required if you don't import through the menu buttons
+head(deck)
+tail(deck)
+```
+
+Bbefore continuing, let's save a new copy of the deck.csv. To find out where it saved it, check the working directory.
+
+```{r}
+getwd()
+setwd("/Users/macbook/Box Sync/Stanford/UI Chicago/Teaching/R4EZDS/hands-on-programming-with-r")
+```
+
+```{r}
+write.csv(deck, file = "cards.csv", row.names = FALSE)
+```
+
+Notice, write.csv() needs three arguments: 
+
+ 1. The name of the object you wish to save
+ 2. The name you should give to the file you wish to save
+ 3. You should stop R from adding a column of numbers using `row.names = FALSE`
+
+Notes on loading data:
+
+ * R can open non-csv files, like Excel (xlsx) files directly
+ * But it's good practice to open data in the original program first
+ * Then export the data in a csv file type
+ * The exception of course being if you don't have the software (and its expensive!)
+
+You should now have a familiarity with:
+
+ - Objects
+ - Attributes
+ - Class
+ - Coercion
+ - Lists
+ - Data Frames
+ - Loading/Saving Data
+ 
+**Great job, you've finished Chapter 3!**
+
