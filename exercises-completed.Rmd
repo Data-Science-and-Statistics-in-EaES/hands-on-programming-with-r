@@ -1050,3 +1050,267 @@ You should now have a familiarity with:
  
 **Great job, you've finished Chapter 3!**
 
+$~$
+
+## Chapter 4: R Notation
+
+In this chapter we will cover:
+
+ 1. Selecting Values
+     + Positive Integers
+     + Negative Integers
+     + Zero
+     + Blank Spaces
+     + Logical Values
+     + Names
+ 2. Deal a Card
+ 3. Shuffle the Deck
+ 4. Dollar Signs and Double Brackets
+
+### Selecting Values
+
+To extract a value or set of values from a data frame use a pair of hard brackets:
+
+```{r}
+deck[,]
+```
+
+There are six ways to write an index in R, each is useful. 
+
+ - Positive integers
+ - Negative integers
+ - Zero
+ - Blank spaces
+ - Logical values
+ - Names
+
+*Positive Integers* work like *i,j* notation in algebra. 
+
+`Deck[i,j]` will return the ith row and the jth column:
+
+```{r}
+head(deck)
+deck[1, 1]
+```
+
+Extract more than one value using a vector of positive integers:
+
+```{r}
+deck[1, c(1, 2, 3)]
+deck[1, 1:3]
+```
+
+R doesn't remove these values, it gives you a new set which you can save to a new R object:
+
+```{r}
+new <- deck[1, 1:3]
+new
+```
+
+You can therefore repeat values more than once, by repeating an index:
+
+```{r}
+deck[c(1, 1), c(1, 2, 3)]
+
+```
+
+R's notation system works for any R object, as long as you supply one index for each dimension:
+
+```{r}
+vec <- c(6, 1, 3, 6, 10, 5)
+vec[1:3]
+```
+
+R's indexing begins at 1, as in algebra, and unlike zero for many other programming langauges. This means, given an index of 1, R returns the first element of an object.
+
+ - If you only select a single column, R will return a vector rather than the dataframe column
+ - If you would prefer the dataframe column is maintained, add drop = FALSE to the brackets
+ 
+```{r}
+deck[1:2, 1]
+deck[1:2, 1, drop = F]
+```
+ 
+*Negative integers* return every element *except* the elements of a negative index. For example:
+
+```{r}
+deck[-(2:52), 1:3]
+```
+
+Returns the first row, and excludes every other row. Negative integers are therefore more efficient for removing just a few rows or columns. You can mix positive and negative integers, but *only* in different indexes (row vs. column):
+
+```{r}
+deck[-1, 1, drop = F]
+```
+
+*Zero* returns nothing from a dimension when you use it as an index, creating an empty object:
+
+```{r}
+deck[0, 0]
+```
+
+It's not very helpful as an index!
+
+*Blank spaces* tell R to extract every value in a dimension (an entire row or column):
+
+```{r}
+deck[1, ]
+deck[, 2, drop = F]
+```
+
+*Logical Values*: T/TRUE values are returned if you provide a vector of same dimension as the object:
+
+```{r}
+deck[1, c(T, T, F)]
+rows <- c(T, rep(F, 51)) # rep calls the repeat function which takes a vector of values and # of repetitions as arguments
+deck[rows, ]
+```
+
+Using logicals may seem a little odd, but it can become a powerful tool!
+
+*Names* can be used to extract values based on their names in the object. Commonly used to extract particular named *columns*:
+
+```{r}
+deck[1, c("face", "suit", "value")]
+deck[ ,"value"]
+```
+
+
+**Exercise**: Deal a Card!
+
+Make a function that returns the first row of a data frame. Complete the basic function syntax:
+
+```{r}
+deal <- function(cards) {
+  # insert your function here
+}
+```
+
+Fill in the function:
+
+```{r}
+deal <- function(cards) {
+  cards[1, ]
+}
+```
+
+Try it out
+```{r}
+deal(deck)
+```
+
+Notice that it always deals the same (top) card:
+
+```{r}
+deal(deck)
+```
+
+This is a difficult problem to solve, so we will come back to it in Chapter 6.
+
+For now, you can just shuffle the deck after every deal. This is not a perfect solution because the card you dealt first is still present. To shuffle, you want to rearrange the order of the cards in your deck, each row in the data frame is a card so you want to randomly reorder the rows:
+
+Start by extracting every row in your data frame:
+
+```{r}
+deck2 <- deck[1:52, ]
+```
+
+The order is replicated exactly:
+
+```{r}
+head(deck2)
+```
+
+Alternatively, you can manually rearrange some of the rows:
+
+```{r}
+deck3 <- deck[c(2, 1, 3:52), ]
+```
+
+However, to randomized the order, you need to sort the integers (row numbers) into a random order. Then use the results as a row index. Use the `sample()` function for this:
+
+```{r}
+random <- sample(1:52, size = 52) # replace will be F by default
+random
+# creates a random index which you can use to subset from deck (below)
+deck4 <- deck[random, ]
+head(deck4)
+```
+
+Now the deck is truly shuffled! Combine with the deal function to create a shuffle function:
+
+```{r}
+shuffle <- function(cards){
+  random <- sample(1:52, size = 52)
+  cards[random, ]
+}
+```
+
+You can now shuffle the card deck between each deal:
+
+```{r}
+deal(deck) # returns the top card of the deck
+deck2 <- shuffle(deck) # randomly shuffles the deck and saves it as a new deck2 object
+deal(deck2) # returns the top card of deck2
+```
+
+#### Dollar Signs and Double Brackets
+
+You can also select a column from a data frame using the $:
+
+```{r}
+deck$value
+```
+
+Notice it will provide options to select from when you add $ to the data frame. This is very handy for computing means or other statistics:
+
+```{r}
+mean(deck$value)
+median(deck$value)
+```
+
+$ can also be used to subset lists in efficient ways. First, confirm that subsetting a list using a regular index returns a list:
+
+```{r}
+lst <- list(numbers = c(1, 2), logical = TRUE, strings = c("a", "b", "c"))
+lst
+lst[1]
+typeof(lst[1]) # notice the output is a list with one element
+```
+
+Most R functions do not work with lists: (remove # sign to run)
+
+```{r}
+#  sum(lst[1])
+```
+
+Use the $ notation instead to get the values with no list structure:
+
+```{r}
+lst$numbers
+sum(lst$numbers)
+```
+
+Alternatively, if you don't have or don't want names, for your list elements, then use double hard brackets to index:
+
+```{r}
+lst[[1]]
+lst[[2]]
+```
+
+Summary:
+
+ - if you subset a list with single-bracket notation, R will return a smaller list
+ - if you subset a list with double-bracket notation, R will return just the values inside that element of the list
+
+You can combine the single or double brackets with any indexing method:
+
+```{r}
+lst["numbers"]
+lst[["numbers"]]
+```
+
+
+
+
+
