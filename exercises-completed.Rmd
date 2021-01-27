@@ -379,7 +379,7 @@ We will try using the `qplot` function which comes from the *ggplot2* package, a
 First, install the package with the following function:
 
 ```{r}
-install.packages("ggplot2")
+# install.packages("ggplot2")
 ```
 
 `qplot` won't work without loading it:
