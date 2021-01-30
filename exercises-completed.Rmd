@@ -1310,6 +1310,456 @@ lst["numbers"]
 lst[["numbers"]]
 ```
 
+You should now have a familiarity with:
+
+ 1. Selecting Values
+     + Positive Integers
+     + Negative Integers
+     + Zero
+     + Blank Spaces
+     + Logical Values
+     + Names
+ 2. Dollar Signs and Double Brackets
+ 
+ 3. And you know how to write a function to shuffle a card deck, and deal a card from a shuffled deck!
+
+**Congrats! You have completed Chapter 4!**
+
+$~$
+
+## Chapter 5: Modifying Values
+
+In this chapter we will cover:
+
+ 1. Changing Values in Place
+ 2. Logical Subsetting
+      + Logical Tests
+      + Boolean Operators
+ 3. Missing Information
+      + na.rm
+      + is.na
+  
+We will use these new skills to change the point system of the deck.
+
+Make a copy of the deck so you can always reload the pristine version:
+
+```{r}
+deck2 <- deck
+```
+
+#### Changing Values in Place
+
+Start by creating a simple vector of zeros:
+
+```{r}
+vec <- c(0, 0, 0, 0, 0, 0)
+vec
+```
+
+Select the first value using hard brackets:
+
+```{r}
+vec[1]
+```
+
+Try modifying the first value with the assignment operator `<-` :
+
+```{r}
+vec[1] <- 1000
+vec
+```
+
+You can replace multiple values, as long as the number of new values ==  number of selected values:
+
+```{r}
+vec[c(1, 3, 5)] <- c(1, 1, 1)
+vec
+```
+
+Whereas this will not work: 
+
+```{r}
+vec[4:6] <- vec[4:6] + 1
+vec
+```
+
+You can also create new values that do not exist yet, by expanding the object:
+
+```{r}
+vec[7] <- 0
+vec
+```
+
+Try adding a new variable to your data set using `$`:
+
+```{r}
+deck2$new <- 1:52
+deck2
+```
+
+Then try removing it with the symbol `NULL`:
+
+```{r}
+deck2$new <- NULL
+```
+
+Let's create a "War Deck", for which aces have the value, 14 rather than 1.
+
+First, use R's notiation system to identify the aces:
+
+```{r}
+deck2[c(13, 26, 39, 52), ]
+```
+
+You can also single out just the value of the aces (in the 3rd column of deck2):
+
+```{r}
+deck2[c(13, 26, 39, 52), 3]
+```
+
+And do it more efficiently with a vector:
+
+```{r}
+deck2$value[c(13, 26, 39, 52)]
+```
+
+Now reassign the aces to 14:
+*Hint*: You can use a vector of 14s, or just one 14 which R will recycle to all elements.
+
+```{r}
+deck2$value[c(13, 26, 39, 52)] 
+deck2$value[c(13, 26, 39, 52)]
+```
+
+Notice the values change "in place".
+
+```{r}
+deck2
+```
+
+The same technique works for vectors, matrices, arrays, lists, and data frames!
+
+In this example, we knew where the aces were but if the deck was shuffled, how would we know which values to reassign?
+
+Shuffle the deck and save it as deck3:
+
+```{r}
+deck3 <- shuffle(deck)
+deck3
+```
+
+Now the aces are hard to find!
+
+#### Logical Subsetting
+
+Logical subsettingcan be used to return elements that match a TRUE:
+
+```{r}
+vec
+vec[c(F, F, F, F, T, F, F)]
+```
+
+However, you don't have to type out a long vector of T and F. Use a *Logical Test* using logical operators:
+E.g.,use the operators:
+
+ + `>` greater than
+ + `>=` greater than or equal to
+ + `<` less than
+ + `<=` less than or equal to
+ + `==` equal to
+ + `!=` not equal to
+ + `%in%` exists within the vector (this one is very handy!)
+
+```{r}
+1 > 2
+1 > c(0, 1, 2)
+c(1, 2, 3) == c(3, 2, 1)
+```
+
+Note: `%in%` does not use element-wise execution, it asks *are the values on the left are on the right side?*:
+
+```{r}
+1 %in% c(3, 4, 5)
+c(1, 2) %in% c(3, 4, 5)
+c(1, 2, 3) %in% c(3, 4, 5)
+```
+
+Remember: `=` is the same as the assignment operateor `<-` in R. Be careful to use `==` when you want to evaluate equivalence (is equal).
+
+**Exercise:** Extract the face column of `deck2`, and test if it is equal to `ace`:
+
+First convert desk faces to characters:
+```{r}
+deck2$face 
+deck2$face <- as.character(deck2$face)
+```
+
+Now perform the *logical test*:
+
+```{r}
+deck2$face == "ace"
+```
+
+You can also count the number of TRUE (treated as 1):
+
+```{r}
+sum(deck2$face == "ace")
+```
+
+You can also use this on your shuffled `deck3`, to the same effect:
+
+```{r}
+deck3$face == "ace"
+```
+
+The logical operator now provides row *indices* to extract rows or individual elements:
+
+```{r}
+deck3$value[deck3$face == "ace"]
+```
+
+Now use the assignment as before to change the values of ace to 14:
+
+```{r}
+deck3$value[deck3$face == "ace"] <- 14
+```
+
+Check to see if aces now have value of 14:
+
+```{r}
+head(deck3, 20) 
+```
+
+They do!
+
+Logical subsetting is a key component of vectorized programming, a coding style that lets you write fast and efficient R code. We come back to this in Chapter 10.
+
+Let's adapt the deck for Hearts, where every card has a value of zero, except suit of hearts, which has a value of 1.
+
+```{r}
+deck4 <- deck
+deck4$value <- 0
+head(deck4, 13)
+```
+
+To assign 1 to every card in deck4 that has a suit of hearts, first find the hearts:
+
+```{r}
+deck4$suit == "hearts"
+```
+
+Check the subset is correct:
+
+```{r}
+deck4$value[deck4$suit == "hearts"]
+```
+
+Assign the new value of 1:
+
+```{r}
+deck4$value[deck4$suit == "hearts"] <- 1
+deck4$value[deck4$suit == "hearts"]
+```
+
+Finally, change the queen of spades to value of 13. Let's find the queen of spades:
+
+```{r}
+deck4[deck4$face == "queen", ] 
+deck4[deck$suit == "spades", ] 
+```
+
+We can't do it with this code! The first line gives all queens and the second line gives all spades. 
+
+#### Boolean Operators
+
+To identify just the queen of spades, we want to use *Boolean Opereators* (and `&`, or `|`) to combine Logical Tests together.
+
+There are six Boolean operators:
+
+ + `&` both conditions (and)
+ + `|` one or other condition
+ + `xor` exactly one condition
+ + `!` false condition
+ + `any` any conditions
+ + `all` all conditions
+ 
+Remember to include the complete test on both sides of the Boolean operator:
+
+```{r}
+x <- 5
+x > 2 & x < 9
+# x > 2 & < 9
+```
+
+If you remove the # sign, the last line gives an error when you try to run it because the test is incomplete on the right side.
+
+
+Boolean opeartors follow the same element-wise execution:
+
+```{r}
+a <- c(1, 2, 3)
+b <- c(1, 2, 3)
+c <- c(1, 2, 4)
+```
+
+```{r}
+a == b
+b == c
+a == b & b == c
+```
+
+Use Boolean operator to locate the queen of spades:
+
+```{r}
+deck4$face == "queen" & deck4$suit == "spades"
+```
+
+Note that we join the two logical tests with a Boolean operator.
+
+Save the results to its own object to make it easier to work with:
+
+```{r}
+queenOfSpades <- deck4$face == "queen" & deck4$suit == "spades"
+```
+
+Make sure it works:
+
+```{r}
+deck4[queenOfSpades, ]
+```
+
+Now assign the new value:
+
+```{r}
+deck4$value[queenOfSpades] <- 13
+```
+
+Set up some new objects to try out more logical tests:
+
+```{r}
+w <- c(-1, 0, 1)
+x <- c(5, 15)
+y <- "February"
+z <- c("Monday", "Tuesday", "Friday")
+```
+
+Is w positive?
+
+```{r}
+w > 0
+```
+
+Is x greater than 10 and less than 20?
+
+```{r}
+x > 10 & x < 20
+```
+
+Is object y the word February?
+
+```{r}
+y == "February"
+```
+
+Is every value in z a day of the week?
+
+```{r}
+all(z %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+```
+
+
+Finally, let's create a card deck to play Blackjack, where all face cards have a value of 10, and ace is either 1 or 11.
+
+Start by creating a new deck:
+
+```{r}
+deck5 <- deck
+head(deck5)
+```
+
+Change the value of face cards in none fell swoop with `%in%`.
+
+First identify the indices:
+```{r}
+facecard <- deck5$face %in% c("king", "queen", "jack")
+deck5[facecard, ]
+```
+
+Then conver the values: 
+
+```{r}
+deck5$value[facecard] 
+deck5$value[facecard] <- 10
+```
+
+Check:
+
+```{r}
+head(deck5, 10)
+```
+
+Right now, we don't have enough information to assign the ace a value (it depends on the player's other cards)!
+
+
+#### Missing Information
+In R, `NA` stands for "Not Available" and is used as a placeholder for missing values. Because we do not know what `NA` is, it will propogate through any calculations:
+
+```{r}
+NA + 1 
+```
+
+Missing values `NA` help you maintain complete data structure rather than having gaps. However they also propogate to other compuations:
+
+```{r}
+mean(c(NA, 1:50))
+```
+
+Most R functions come with an optional argument, `na.rm`, which stands for `NA` remove. If `na.rm = TRUE`, it will ignore `NA`s:
+
+```{r}
+mean(c(NA, 1:50), na.rm = T)
+```
+
+Again, because we don't know what `NA` is, we also can't identify it using logical tests (remove # sign):
+
+```{r}
+# NA == NA
+# c(1, 2, 3, NA) == NA 
+```
+
+But, R uses the function `is.na()` to identify if a value is an `NA`:
+
+```{r}
+is.na(NA)
+```
+
+Use `is.na()` to identify the index of `NA` in a data structure such as a vector:
+
+```{r}
+vec <- c(1, 2, 3, NA)
+is.na(vec)
+```
+
+So, finally, set all ace values to `NA`, because we don't know the real value until the end of a players turn:
+
+```{r}
+deck5$value[deck5$face == "ace"] <- NA
+head(deck5, 13)
+```
+
+You should now have a familiarity with:
+
+ 1. Changing Values in Place
+ 2. Logical Subsetting
+      + Logical Tests
+      + Boolean Operators
+ 3. Missing Information
+      + na.rm
+      + is.na
+  
+**Congrats! You have now finished Chapter 5!**
+
+
 
 
 
