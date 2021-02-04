@@ -1759,6 +1759,166 @@ You should now have a familiarity with:
   
 **Congrats! You have now finished Chapter 5!**
 
+$~$
+
+## Chapter 6: Environments
+
+In this chapter we will cover:
+
+ 1. Environments
+ 2. Working with Environments
+      + The Active Environment
+      + Scoping Rules
+      + Assignment
+      + Evaluation
+      + Closures
+      
+To finalize the functions `deal()` and `shuffle()` we need to consider how R uses environments.
+
+R saves every object inside of an environment, a list-like object that resembles a computer folder. Each environment is connected to a hierarchy of environments. You can see R's environment system with:
+
+```{r}
+install.packages("pryr")
+library(pryr)
+parenvs(all = TRUE)
+```
+
+The environments are ranked from "lowest" to "highest". The highest environment being `R_EmptyEnv` and lowest environment being `R_GlobalEnv`.
+
+Although seemingly like a folder directory hierarchy there are two main differences:
+
+ + R's environments are stored in RAM
+ + R's environments are not searchable down the environment "tree"
+
+#### Environment Helper Functions
+
+Look at an environment:
+
+```{r}
+as.environment("package:stats")
+```
+
+Which shows the path too.
+
+Three environments come with their own accessor functions:
+
+```{r}
+globalenv()
+baseenv()
+emptyenv()
+```
+
+Look up an environment's parent with:
+
+```{r}
+parent.env(globalenv())
+```
+
+Notice that the highest environment has no parent:
+
+```{r}
+parent.env(emptyenv())
+```
+
+You can view objects saved in an environment with:
+
+```{r}
+ls(emptyenv())
+ls(globalenv())
+```
+
+Load the deck again to check:
+
+```{r}
+deck <- read.csv("deck.csv")
+ls(globalenv())
+```
+
+And learn more about the environment structure:
+
+```{r}
+ls.str(globalenv())
+```
+
+The base environment has many objects:
+
+```{r}
+ls.str(baseenv())
+```
+
+RStudio's environment pane displays all the objects in your global environment.
+
+You can use the `$` syntax to access the `deck` object from the global environment accessor:
+
+```{r}
+head(globalenv()$deck, 3)
+```
+
+You can also use the `assign()` function to save an object into an environment:
+
+```{r}
+assign("new", "Hello Global", envir = globalenv())
+globalenv()$new
+```
+
+Assign works similar to <-.
+
+#### The Active Environment
+
+Check the active environment using:
+
+```{r}
+environment()
+```
+
+This is usual unless you are running a function. Any object you create at the command line will be saved in the global environment. Think of it as your user work space.
+
+**Scoping Rules** are used to look up objects:
+
+ 1. R Looks for objects in the current environment - global environment for command line
+ 2. If not found, R looks up and up the parent environment tree
+
+Remember, functions are objects and will be searched for like anything else
+in the environment tree.
+
+**Assignment**: Assigning an object a new value will overwrite it:
+
+```{r}
+new
+new <- "Hello Active"
+new
+```
+
+But when functions are called, *R creates a new active environment to evaluate the function in* because temporary objects within the function could otherwise overwrite global environment objects.
+
+**Evaluation**: Temporary environments for function runs are called *run time environments*. Let's write a function to show what environments look like:
+
+```{r}
+show_env <- function(){
+  list(ran.in = environment(),
+       parent = parent.env(environment()),
+       objects = ls.str(environment()))
+}
+```
+
+`show_env()` is a function, so when it is called, R creates a run time environment. The results of `show_env()` will therefore show the details of the run time environment:
+
+```{r}
+show_env()
+```
+
+Notice R created a new environment `0x7f8bf05382b0`to run `show_env()`. It contained no objects, and its parent environment was the global environment. If you run it again, you'll see it creates a new but otherwise identical temporary environment:
+
+```{r}
+show_env()
+```
+
+
+
+
+
+
+
 
 
 
