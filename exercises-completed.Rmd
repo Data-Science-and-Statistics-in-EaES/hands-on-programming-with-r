@@ -1912,6 +1912,149 @@ Notice R created a new environment `0x7f8bf05382b0`to run `show_env()`. It conta
 ```{r}
 show_env()
 ```
+R will connect a function's run-time environment to the environment that the function was *first created in*.
+
+Look up a functions origin environment to show it was created in the global environment:
+
+```{r}
+environment(show_env)
+```
+
+But the origin environment can also be a parent environment:
+
+```{r}
+environment(parenvs)
+```
+
+Create some objects within the `show_env()` function:
+
+```{r}
+show_env <- function(){
+  a <- 1
+  b <- 2
+  c <- 3
+  list(ran.in = environment(),
+       parent = parent.env(environment()),
+       objects = ls.str(environment()))
+}
+show_env()                                         
+```
+
+The objects `a-c` are stored in a safe, out-of-the-way run-time environment.
+A function with arguments will copy the objects to the runtime environment:
+
+```{r}
+foo <- "take me to your runtime"
+show_env <- function(x = foo){
+  list(ran.in = environment(),
+       parent = parent.env(environment()),
+       objects = ls.str(environment()))
+}
+show_env()
+```
+
+We can refer to the working environment where you call the function from the *calling environment*.
+
+**Putting it all together**:
+
+ 1. R sets up a new run-time environment, as the child of the function's origin environment
+ 2. R copies each of the arguments into the run-time environment and makes it the active environment
+ 3. R runs the code in the body of the function:
+    + Stores any created objects
+    + Uses scoping rules for any called objects
+    + Usually a function only calls its own arguments
+ 4. R ends the function, switches the environment back, and runs any other commands in line
+ 
+So, for example, if you save the result to `<-`, it will be saved in the *calling* environment.
+
+So, how to fix `deal()` and `shuffle()`?
+
+Redefine `deal()` (to deal the top card of the deck):
+
+```{r}
+deal <- function(){
+  deck[1, ]
+}
+deal()
+```
+ 
+It still works even without the `cards` argument which copies over the deck because the run-time environment scopes up to the global environment (parent of the active function environment) to look for `deck`.
+
+We want `deal()` to remove the top card after dealing it.
+
+Save a pristine `deck`:
+```{r}
+DECK <- deck
+```
+
+Remember how to remove the top card using a negative dataframe index:
+
+```{r}
+deck <- deck[-1, ]
+head(deck)
+```
+Now apply it to `deal()`:
+
+```{r}
+deal <- function(){
+  card <- deck[1, ]
+  deck <- deck[-1, ]
+  card
+}
+deal()
+deal()
+```
+
+What's wrong here? R only removes the top card in the run-time environment. We need to assign `deck[-1, ]` to an object named `deck` in the global environment:
+
+```{r}
+deal <- function(){
+  card <- deck[1, ]
+  assign("deck", deck[-1, ], envir = globalenv())
+  card
+}
+deal()
+deal()
+deal()
+```
+
+Now lets finalize `shuffle()`:
+
+```{r}
+deck <- DECK
+shuffle <- function(cards){
+  random <- sample(1:52, size = 52)
+  cards[random, ]
+}
+```
+
+Remember that `shuffle()` returns a shuffled object, rather than shuffling `deck`:
+
+```{r}
+shuffle(deck)
+a <- shuffle(deck)
+a
+
+```
+
+Rewrite `shuffle()` so it replaces deck with a shuffled `DECK` (in the global environment). It should have no assignments and return no output:
+
+```{r}
+shuffle <- function(){
+  random <- sample(1:52, size = 52)
+  assign("deck", DECK[random, ], envir = globalenv())
+}
+```
+
+Check it works:
+
+```{r}
+shuffle(); deck
+shuffle(); deck
+shuffle(); deck
+```
+
+
 
 
 
