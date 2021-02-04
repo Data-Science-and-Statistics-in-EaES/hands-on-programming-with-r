@@ -1017,8 +1017,8 @@ tail(deck)
 Bbefore continuing, let's save a new copy of the deck.csv. To find out where it saved it, check the working directory.
 
 ```{r}
-getwd()
-setwd("/Users/macbook/Box Sync/Stanford/UI Chicago/Teaching/R4EZDS/hands-on-programming-with-r")
+wd <- getwd()
+setwd(wd)
 ```
 
 ```{r}
