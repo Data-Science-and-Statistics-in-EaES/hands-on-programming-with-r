@@ -1778,7 +1778,7 @@ To finalize the functions `deal()` and `shuffle()` we need to consider how R use
 R saves every object inside of an environment, a list-like object that resembles a computer folder. Each environment is connected to a hierarchy of environments. You can see R's environment system with:
 
 ```{r}
-install.packages("pryr")
+# install.packages("pryr") # remove comment to run
 library(pryr)
 parenvs(all = TRUE)
 ```
@@ -1817,7 +1817,7 @@ parent.env(globalenv())
 Notice that the highest environment has no parent:
 
 ```{r}
-parent.env(emptyenv())
+#  parent.env(emptyenv()) # will return an error if you run without #
 ```
 
 You can view objects saved in an environment with:
@@ -2054,8 +2054,168 @@ shuffle(); deck
 shuffle(); deck
 ```
 
+Now we can shuffle the cards and deal a hand of blackjack:
+
+```{r}
+shuffle() # shuffles a complete new deck
+deal() # deals the top card and removes it from the deck
+deal()
+deal()
+```
+
+Restore `deck` again:
+
+```{r}
+deck <- DECK
+deck
+```
+To save objects in a safe place, such as a run time environment, create a function that takes `deck` as an argument, saves a copy as `DECK` and its own copies of `deal()` and `shuffle()`:
+
+```{r}
+setup <- function(deck) {
+  DECK <- deck
+  
+  DEAL <- function() {
+    card <- deck[1, ]
+    assign("deck", deck[-1, ], envir = globalenv())
+    card
+  }
+  
+  SHUFFLE <- function() {
+    random <- sample(1:52, size = 52)
+    assign("deck", DECK[random, ], envir = globalenv())
+  }
+}
+```
+
+When you run `setup()`, R will create a run-time environment to store the objects in:
+
+```{r}
+setup(deck)
+```
+
+However they are now hard to use. Change `setup()` to return `DEAL` and `SHUFFLE` using a list:
+
+```{r}
+setup <- function(deck) {
+  DECK <- deck
+  
+  DEAL <- function() {
+    card <- deck[1, ]
+    assign("deck", deck[-1, ], envir = globalenv())
+    card
+  }
+  
+  SHUFFLE <- function() {
+    random <- sample(1:52, size = 52)
+    assign("deck", DECK[random, ], envir = globalenv())
+  }
+  list(deal = DEAL, shuffle = SHUFFLE)
+}
+setup(deck) 
+```
+
+Now the functions are returned in a list when you run `setup()`. 
+
+You can assign it to a new object in the global environment:
+
+```{r}
+cards <- setup(deck)
+```
+
+And save each element to its own object:
+
+```{r}
+deal <- cards$deal
+shuffle <- cards$shuffle
+deal
+shuffle
+```
+
+Notice the origin environment is now the run-time environment R made when you ran `setup()`. R will always be able to find `DECK` and `deck,` but without altering them:
+
+This arrangement is called *closure*: Setup's run-time environment "encloses" the `deal()` and `shuffle()` functions. The enclosing environment is not on the search path for any other R function or environment:
+
+Try running them:
+
+```{r}
+shuffle()
+deck
+shuffle()
+deck
+nrow(deck)
+
+deal()
+deal()
+nrow(deck)
+```
+Notice the global `deck` is still being updated. Change the `envir` argument in assign to reference the parent environment which is setup's run-time environment (the "enclosing" environment):
+
+```{r}
+setup <- function(deck) {
+  DECK <- deck
+  
+  DEAL <- function() {
+    card <- deck[1, ]
+    assign("deck", deck[-1, ], envir = parent.env(environment()))
+    card
+  }
+  
+  SHUFFLE <- function() {
+    random <- sample(1:52, size = 52)
+    assign("deck", DECK[random, ], envir = parent.env(environment()))
+  }
+  list(deal = DEAL, shuffle = SHUFFLE)
+}
+```
+
+Now `deck` should remain unchanged:
+
+```{r}
+cards <- setup(deck) 
+deal <- cards$deal
+shuffle <- cards$shuffle
+
+deck
+shuffle()
+deck
+```
+
+Notice you can now assign a shuffled deck to a new object without changing deck:
+
+```{r}
+deck_2 <- shuffle()
+deck_3 <- shuffle()
+deck_2 
+deck_3
+deck
+```
+Now `shuffle()` gives a new shuffled deck, but doesn't alter global environment deck because the functions now only alter deck in the enclosed (`setup()`) run-time environment. You can remove the global environment copy of deck and play with just the cards functions:
+
+```{r}
+rm(deck)
 
 
+deal()
+shuffle()
+deal()
+shuffle()
+deal()
+```
+
+The real value of this knowledge is knowing how to diagnose function errors/behavior.
+
+You should now be familiar with:
+
+ 1. Environments
+ 2. Working with Environments
+      + The Active Environment
+      + Scoping Rules
+      + Assignment
+      + Evaluation
+      + Closures
+      
+**Congrats, you've now completed Chapter 6!**
 
 
 
