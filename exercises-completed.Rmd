@@ -2740,6 +2740,8 @@ Now you can play with your slot machine:
 play()
 ```
 
+**Congrats!** You've now finished Chapter 7!
+
 Summary: An R program is a set of instructions for your computer to follow that has been organized into a sequences of steps and cases. A program may seem impossible to write, but don't panic. Divide the job into simple tasks. Work on each task one at a time. Describe each task in English, then convert to R code. Test each solution against concrete examples as you go. Once each of your subtasks works, combine your code into a function you can share and reuse.
 
 You should now be familiar with:
