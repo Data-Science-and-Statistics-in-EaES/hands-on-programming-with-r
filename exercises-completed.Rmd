@@ -2477,106 +2477,143 @@ bars <- symbols %in% c("B", "BB", "BBB")
 Now we want to assign prizes to the different symbol combinations. To do so efficiently, we need to use **lookup tables**.
 
 
-# LOOKUP TABLES
+### Lookup Tables
 
-# Before we look at lookup tabless, we can consider subsetting a vector
+Before we look at lookup tables, we can reconsider subsetting a vector:
+
+```{r}
 payouts <- c("DD" = 100, "7" = 80, "BBB" = 40, "BB" = 25,
              "B" = 10, "C" = 10, "0" = 0)
 payouts # will return all the values
-# but you can also index by name
-payouts["DD"]
+payouts["DD"] # but you can also index by name
+```
 
-# if you only want the value, without the name
+If you only want the value, without the name:
+
+```{r}
 unname(payouts["DD"])
+```
 
-# you can also index using numeric values
+You can also index using numeric values:
+
+```{r}
 unname(payouts[1])
+```
 
-# now we can add code to look up the value for 3 of a kind
-same <- symbols[1] == symbols[2] && symbols [2] == symbols[3] 
-bars <- symbols %in% c("B", "BB", "BBB")
+Now we can add code to look up the value for 3 of a kind:
 
-if (same) {
-  payouts <- c("DD" = 100, "7" = 80, "BBB" = 40, "BB" = 25,
-               "B" = 10, "C" = 10, "0" = 0)
-  prize <- unname(payouts[symbols[1]])
-} else if (all(bars)) {
-  prize <- # assign $5
-} else {
-  # count cherries 
-  prize <- # calculate a prize
-}
+```{r}
+# same <- symbols[1] == symbols[2] && symbols [2] == symbols[3] 
+# bars <- symbols %in% c("B", "BB", "BBB")
+# 
+# if (same) {
+#   payouts <- c("DD" = 100, "7" = 80, "BBB" = 40, "BB" = 25,
+#                "B" = 10, "C" = 10, "0" = 0)
+#   prize <- unname(payouts[symbols[1]])
+# } else if (all(bars)) {
+#   prize <- # assign $5
+# } else {
+#   # count cherries 
+#   prize <- # calculate a prize
+# }
+```
 
-# we can also add the second case which is simply $5
-same <- symbols[1] == symbols[2] && symbols [2] == symbols[3] 
-bars <- symbols %in% c("B", "BB", "BBB")
 
-if (same) {
-  payouts <- c("DD" = 100, "7" = 80, "BBB" = 40, "BB" = 25,
-               "B" = 10, "C" = 10, "0" = 0)
-  prize <- unname(payouts[symbols[1]])
-} else if (all(bars)) {
-  prize <- 5
-} else {
-  # count cherries 
-  prize <- # calculate a prize
-}
+We can also add the second case which is simply $5:
 
-# for the 3rd case, we need to compute how many cherries are in symbols
+```{r}
+# same <- symbols[1] == symbols[2] && symbols [2] == symbols[3] 
+# bars <- symbols %in% c("B", "BB", "BBB")
+# 
+# if (same) {
+#   payouts <- c("DD" = 100, "7" = 80, "BBB" = 40, "BB" = 25,
+#                "B" = 10, "C" = 10, "0" = 0)
+#   prize <- unname(payouts[symbols[1]])
+# } else if (all(bars)) {
+#   prize <- 5
+# } else {
+#   # count cherries 
+#   prize <- # calculate a prize
+# }
+```
+
+For the 3rd case, we need to compute how many cherries are in symbols:
+
+```{r}
 symbols <- c("C", "DD", "C")
-# create a test to identify which elements of symbols are "C"
+```
+
+Create a test to identify which elements of symbols are "C":
+
+```{r}
 symbols == "C"
-# how might you count the number of Cs? (remember coercion rules)
+```
+
+How might you count the number of Cs? (remember coercion rules):
+
+```{r}
 sum(symbols == "C")
+```
 
+We can also add the first part of the third case to the code:
 
-# we can also add the first part of the third case to the code
-same <- symbols[1] == symbols[2] && symbols [2] == symbols[3] 
-bars <- symbols %in% c("B", "BB", "BBB")
+```{r}
+# same <- symbols[1] == symbols[2] && symbols [2] == symbols[3] 
+# bars <- symbols %in% c("B", "BB", "BBB")
+# 
+# if (same) {
+#   payouts <- c("DD" = 100, "7" = 80, "BBB" = 40, "BB" = 25,
+#                "B" = 10, "C" = 10, "0" = 0)
+#   prize <- unname(payouts[symbols[1]])
+# } else if (all(bars)) {
+#   prize <- 5
+# } else {
+#   cherries <- sum(symbols == "C")
+#   prize <- # caculate a prize
+# }
+```
 
-if (same) {
-  payouts <- c("DD" = 100, "7" = 80, "BBB" = 40, "BB" = 25,
-               "B" = 10, "C" = 10, "0" = 0)
-  prize <- unname(payouts[symbols[1]])
-} else if (all(bars)) {
-  prize <- 5
-} else {
-  cherries <- sum(symbols == "C")
-  prize <- # caculate a prize
-}
+3 cherries are already covered by case 1. 
+2 cherries gets `$5`, 1 cherry gets `$2`, no cherries gets `$0`
 
-# 3 cherries are aleady covered by case 1
-# 2 cherries gets $5, 1 cherry gets $2, no cherries gets $0
+We could write an inefficient 'if' tree:
 
-# we could write an inefficient 'if' tree
-if (cherries == 2) {
-  prize <- 5
-} else if (cherries == 1) {
-  prize <- 2
-} else {
-  prize <- 0
-}
-#
+```{r}
+# if (cherries == 2) {
+#   prize <- 5
+# } else if (cherries == 1) {
+#   prize <- 2
+# } else {
+#   prize <- 0
+# }
+```
 
-# but a lookup table is faster
+But a lookup table is faster
 
+```{r}
 c(0, 2, 5)
 # notice the first element is the 0
 c(0, 2, 5)[1]
 # the second element is 2
 c(0, 2, 5)[2]
+```
 
-# remember that cherries could equal 0, 1, or 2 (3 is already covered)
-# if we use the value of cherries as the index, and cherries = 0, then
+Remember that cherries could equal 0, 1, or 2 (3 is already covered). If we use the value of cherries as the index, and cherries = 0, then will return nothing:
+
+```{r}
 c(0, 2, 5)[0]
-# will return nothing
+```
 
-# so we need to offset the indexing by 1 
+So we need to offset the indexing by 1:
+
+```{r}
 c(0, 2, 5)[0 + 1] # cherries(0) + 1
 c(0, 2, 5)[1 + 1] # cherries(1) + 1
+```
 
+We can also add the second part of the third case to the code:
 
-# we can also add the second part of the third case to the code
+```{r}
 same <- symbols[1] == symbols[2] && symbols [2] == symbols[3] 
 bars <- symbols %in% c("B", "BB", "BBB")
 
@@ -2590,6 +2627,131 @@ if (same) {
   cherries <- sum(symbols == "C")
   prize <- c(0, 2, 5)[cherries + 1]
 }
+
+```
+
+You can usually avoid `if` trees by using lookup tables (but not always).
+
+As a general rule:
+      + Use an 'if' tree if each branch runs different code
+      + Use a look up table if each branch only assigns a different value
+
+The final task is to double the prize for every diamond present. How do we code this? 
+Remember that 1 = 2 ^ 0; 2 = 2 ^ 1; 4 = 2 ^ 2; 8 = 2 ^ 3
+
+Write a method in English then write the code:
+
+Formal sub-task: "double prize for every diamond present"
+English: an object named prize will be multiplied by 2 raised to a number that equals the number of diamonds contained in the symbols vector
+
+```{r}
+diamonds <- sum(symbols == "DD")
+prize * 2 ^ diamonds
+```
+
+W can now add the last code line:
+
+```{r}
+same <- symbols[1] == symbols[2] && symbols [2] == symbols[3] 
+bars <- symbols %in% c("B", "BB", "BBB")
+
+if (same) {
+  payouts <- c("DD" = 100, "7" = 80, "BBB" = 40, "BB" = 25,
+               "B" = 10, "C" = 10, "0" = 0)
+  prize <- unname(payouts[symbols[1]])
+} else if (all(bars)) {
+  prize <- 5
+} else {
+  cherries <- sum(symbols == "C")
+  prize <- c(0, 2, 5)[cherries + 1]
+}
+diamonds <- sum(symbols == "DD")
+prize * 2 ^ diamonds
+```
+
+Congrats! You now have a working `score()` script you can save to a function!
+
+First, let's add some comments to the code to show what each section does:
+```{r}
+# identify case
+same <- symbols[1] == symbols[2] && symbols [2] == symbols[3] 
+bars <- symbols %in% c("B", "BB", "BBB")
+
+# get prize
+if (same) {
+  payouts <- c("DD" = 100, "7" = 80, "BBB" = 40, "BB" = 25,
+               "B" = 10, "C" = 10, "0" = 0)
+  prize <- unname(payouts[symbols[1]])
+} else if (all(bars)) {
+  prize <- 5
+} else {
+  cherries <- sum(symbols == "C")
+  prize <- c(0, 2, 5)[cherries + 1]
+}
+
+# adjust prize for diamonds
+diamonds <- sum(symbols == "DD")
+prize * 2 ^ diamonds
+```
+
+Now wrap it in a function (remember what arguments (inputs) it will need):
+
+```{r}
+score <- function(symbols) {
+  # identify case
+  same <- symbols[1] == symbols[2] && symbols [2] == symbols[3] 
+  bars <- symbols %in% c("B", "BB", "BBB")
+  
+  # get prize
+  if (same) {
+    payouts <- c("DD" = 100, "7" = 80, "BBB" = 40, "BB" = 25,
+                 "B" = 10, "C" = 10, "0" = 0)
+    prize <- unname(payouts[symbols[1]])
+  } else if (all(bars)) {
+    prize <- 5
+  } else {
+    cherries <- sum(symbols == "C")
+    prize <- c(0, 2, 5)[cherries + 1]
+  }
+  
+  # adjust prize for diamonds
+  diamonds <- sum(symbols == "DD")
+  prize * 2 ^ diamonds
+}
+
+score(symbols)
+```
+
+Notice because we did not assign the final prize value to an object, it outputs instead.
+
+You can now combine it with the play function:
+
+```{r}
+play <- function(){
+  symbols <- get_symbols()
+  print(symbols)
+  score(symbols)
+}
+```
+
+Now you can play with your slot machine:
+
+```{r}
+play()
+```
+
+Summary: An R program is a set of instructions for your computer to follow that has been organized into a sequences of steps and cases. A program may seem impossible to write, but don't panic. Divide the job into simple tasks. Work on each task one at a time. Describe each task in English, then convert to R code. Test each solution against concrete examples as you go. Once each of your subtasks works, combine your code into a function you can share and reuse.
+
+You should now be familiar with:
+
+ 1. Programs
+      + Strategy (for coding programs)
+      + Sequential Steps
+      + Parallel Cases
+ 2. if Statements
+ 3. else Statements
+ 4. Lookup Tables
+ 5. Code Comments
 
 
 
