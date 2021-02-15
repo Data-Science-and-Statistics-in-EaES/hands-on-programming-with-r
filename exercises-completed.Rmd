@@ -2755,6 +2755,419 @@ You should now be familiar with:
  4. Lookup Tables
  5. Code Comments
 
+$~$
+
+## Chapter 8: S3
+
+In this chapter we will cover:
+
+  1. The S3 System
+  2. Attributes
+  3. Generic Functions
+  4. Methods
+      + Method Dispatch
+  5. Classes
+  6. S3 and Debugging
+  7. S4 and R5
+
+We will fix the slot machine in two ways: 
+
+  1. Improve appearance out of output
+  2. Make the output assign-able to an object 
+  
+Notice the output of play is quite messy:
+
+```{r}
+one_play <- play()
+one_play
+```
+
+You can fix both of these problems with the "S3 system".
+
+The S3 system governs how R handles objects of different classes. For example when you print a numeric object it looks like this:
+
+```{r}
+num <- 10000000
+print(num)
+```
+
+Whereas if you give the number a POSIXct followed by POSIXt:
+
+```{r}
+class(num) <- c("POSIXct", "POSIXt")
+print(num)
+```
+
+R's S3 system applies for any object with a class and is built around 3 components:
+
+  + attributes
+  + generic functions
+  + methods
+
+Attributes: extra information appended to an object. E.g. rows and column names appended to a dataframe object (and "data.frame" as a class)
+
+```{r}
+attributes(DECK)
+```
+
+You've already used:
+
+```{r}
+names(DECK)
+dim(DECK)
+class(DECK)
+```
+
+But there is also:
+
+```{r}
+row.names(DECK)
+```
+
+You can assign an object a new attribute altogether:
+
+```{r}
+levels(DECK) <- c("level 1", "level 2", "level 3")
+attributes(DECK)
+```
+
+R will let you add any attributes and often ignores them. R will only complain whenit needs an atribute and it is missing.
+ 
+Look at the attributes of `one_play()`:
+
+```{r}
+attributes(one_play)
+```
+
+You can assign attributes with `attr()`. It takes two arguments: 
+  1. An R object
+  1. A name of an attribute
+  
+```{r}
+attr(one_play, "symbols") <- c("B", "0", "B")
+attributes(one_play)
+```
+  
+Or look up a specific attribute:
+```{r}
+attr(one_play, "symbols")
+one_play
+```
+
+Notice the attribute is listed below the value, however, if the attribute changes the class, it may simply alter the display.
+
+R will ignore attributes unless they need them:
+
+```{r}
+one_play + 1
+```
+
+Modify `play()` to return a prize that contains the symbols as an attribute:
+
+```{r}
+play <- function(){
+  symbols <- get_symbols()
+  prize <- score(symbols)
+  attr(prize, "symbols") <- symbols
+  prize
+}
+```
+
+Notice that now the prize and the associated symbols are returned:
+
+
+```{r}
+one_play <- play()
+attributes(one_play)
+play()
+```
+
+Assign this new version of `play()` to `two_play()`:
+
+```{r}
+two_play <- play()
+two_play
+```
+
+You can also set multiple attributes at once with `structure()`:
+
+```{r}
+play <- function(){
+  symbols <- get_symbols()
+  structure(score(symbols), symbols = symbols)
+}
+play()
+```
+
+Assign this efficient method to a new object:
+
+```{r}
+three_play <- play()
+three_play
+```
+
+Now you can look up attributes to display the slot results nicely:
+
+```{r}
+slot_display <- function(prize){
+  
+  # extract symbols
+  symbols <- attr(prize, "symbols")
+  
+  # collapse symbols into a single string
+  symbols <- paste(symbols, collapse = " ")
+  
+  # combine symbol with prize as a regular expression
+  # \n is regular expression for new line (i.e. return or enter)
+  string <- paste(symbols, prize, sep = "\n$")
+  
+  # display regular expression in console without quotes
+  cat(string)
+  
+}
+```
+
+Try it out:
+
+```{r}
+slot_display(three_play)
+```
+
+`slot_display` expects an object with a numerical value and a `symbols` attribute.
+
+`cat()` (concatenate) is similar to `print()`, but doesn't output quotation marks, and takes other operations like `\n` for new line:
+
+```{r}
+string <- paste("symbols", "prize", sep = "\n$")
+string
+cat(string)
+```
+
+So you can use `slot_display()` as a manually defined function to clean up the output of play:
+
+```{r}
+slot_display(play())
+```
+
+But you can also clean up output (and do other things) automatically with...
+
+
+#### Generic Functions
+
+R uses generic functions frequently in the background, such as:
+
+```{r}
+print(pi)
+pi
+```
+
+```{r}
+print(head(DECK))
+head(DECK)
+```
+
+```{r}
+print(play())
+```
+
+Notice that `print()` as a generic function does different things in different cases:
+
+```{r}
+num <- 100000
+print(num)
+```
+
+Versus... 
+
+```{r}
+class(num) <- c("POSIXct", "POSIXt")
+print(num)
+```
+
+`Print()` displayed the value of the object num differently when its class changed.
+
+```{r}
+print # when you call print, print calls a special function 'UseMethod"
+```
+
+`UseMethod()` checks the class of the first argument in print and passes all the arguments to a special function designed for that class:
+
+```{r}
+print.POSIXct # is the function for dates
+print.factor # is for factors
+```
+
+`.POSIXct` and `.factor` are called **methods** of print. They work as stand-alone functions, but also can be called within print automatically with `UseMethod()`:
+
+You can check all the methods for a generic function by calling methods:
+
+```{r}
+methods(print)
+```
+
+**S3 is this system of generic functions, methods, and class-based dispatch**
+
+Generic Functions include:
+
+```{r}
+summary
+head
+```
+
+Other generic functions call `.primitive` rather than `UseMethod()`:
+
+```{r}
+# +
+# - 
+```
+
+We can use S3 to format the slot output by giving the output its own class. To do this efficiently we need to know how `UseMethod()` selects a method function to use.
+
+#### Method Dispatch
+
+Every S3 method has a two-part name. First the function then the method, separated by a period:
+
+```{r}
+print.function
+summary.matrix
+```
+
+S3 searches for R functions simply using their name. Test it out with `one_play()`. Start by giving `one_play()` a class of its own;
+
+```{r}
+one_play <- play()
+class(one_play) <- "slots"
+```
+
+Then create an S3 print method for the `slots` class. It just needs to have the correct name, and take the same arguments as print:
+
+```{r}
+args(print)
+```
+
+Notice the only required argument for `print()` is `x`.
+
+```{r}
+print.slots <- function(x) {
+  cat("I'm using the print.slots method")
+}
+print.slots()
+```
+
+Check if it works on `one_play()`:
+
+```{r}
+print(one_play)
+print.slots(one_play)
+```
+
+Notice also that print automatically uses `.slots` to display `one_display()`:
+
+```{r}
+one_play
+attributes(one_play)
+```
+
+We can write a better function, so remove this one:
+
+```{r}
+rm(print.slots)
+```
+
+Some objects have multiple classes:
+
+```{r}
+now <- Sys.time()
+now
+attributes(now)
+```
+
+`UseMethod()` will look for a method that matches the first class, if it can't find one, it will look for a match with the second. If you give `print()` an object whose class or classes don't have a print method `UseMethod()` will call `print.default`:
+
+```{r}
+one_play
+print(one_play)
+```
+
+Write a new `print.` method for the `slots` class. The method should call `slot_display()` to return a well-formatted slot-machine output:
+
+```{r}
+print.slots <- function(x) {
+  slot_display(x)
+}
+print.slots(one_play)
+```
+
+Because `one_play()` now has class `slots'` and a `print.slots` method exists, R will now automatically use `slot_display()` to display objects of class `slots`. We still have to make sure that every slot machine output has the `slots` class. Modify the `play()` function so it assigns `slots` to the class attribute of its output:
+
+```{r}
+play <- function() {
+  symbols <- get_symbols()
+  structure(score(symbols), symbols = symbols, class = "slots")
+}
+```
+
+Now each slot machine play will have class `slots`:
+
+```{r}
+attributes(play())
+```
+
+So R will display them in the correct format:
+
+```{r}
+play()
+```
+
+#### Classes
+
+You can use the S3 system to create a robust new class of objects in R:
+
+  1. Choose a name for your class
+  2. Assign each instance of your class a 'class' attribute
+  3. Write class methods for any generic function likely to use your object
+
+Bear in mind classes can have many associated methods:
+
+```{r}
+methods(class = "factor")
+```
+
+A well-behaved class requires you to write a class method for every basic R operation.
+
+Consider two challenges:
+
+  1. R drops attributes when objects are combined into a vector
+  
+```{r}
+play1 <- play()
+play1
+play2 <- play()
+play2
+c(play1, play2)
+```
+  
+R stops using `print.slots()` to display the vector because the vector no longer has the `slots` class attribute.
+
+  2. will also drop attributes of an object (like class) when you subset the object:
+  
+```{r}
+play1[1]
+```
+  
+You can avoid this by writing `c.slots` and `[.slots` methods, but difficulties quickly accrue.
+
+In our case, it is handy to let `slots` objects revert to `prize` values when we combine groups of them together.
+
+Summary:
+
+  + R's S3 system lets you store information in R and create unique behavior
+  + It's R's version of object-oriented programming (OOP)
+  + The system is implemented by **generic functions**, which examine the class attribute of their input and call a class-specific method to generate output.
+  + Knowledge of S3 is more helpful as computer science, rather than data science. 
+  + But it can help you trouble shoot your data science tasks.
+  
+**Congrats, you have finished Chapter 8!**
 
 
 
