@@ -3177,3 +3177,376 @@ Summary:
 
 
 
+
+
+## Chapter 9: Loops
+
+In this chapter we will cover:
+  - Expected Values
+  - expand.grid
+  - for Loops
+  - while Loops
+  - repeat Loops
+  
+We will adapt the `score()` function to identify the slot machine payout rate# which will be equal to the **expected value** of the slot machine's prize.
+
+The expected value is the sum of each possible outcome, weighted by the probability of each outcome. Think of it like the average prize value if you played the slot machine an infinite number of times.
+
+Let's use the expected value formula to calculate some expected values, then apply it to the slot machine.
+
+The expected value is just the *sum of each value multiplied by each value's probability*. If your die is fair, each outcome will occur with the same probability (1/6):
+
+```{r}
+die <- c(1, 2, 3, 4, 5, 6)
+p <- c(1/6, 1/6, 1/6, 1/6, 1/6, 1/6)
+E_die <- sum(die*p)
+E_die 
+mean(die)
+```
+
+Notice, when each outcome has an equal probability, `E_die` will equal the mean value of die. But, what if each outcome was not equal?
+
+```{r}
+p <- c(1/8, 1/8, 1/8, 1/8, 1/8, 3/8)
+E_die <- sum(die*p)
+E_die 
+```
+
+Notice the expected value no longer equals the mean value of the die.
+
+There are three steps to this process:
+  1. List out all the possible outcomes
+  2. Determine the *value* of each outcome
+  3. Calculate that probability each out occurred
+  
+The expected value is then just the sum of 2. multiplied by the probabilities in 3. You can use this even in more complex problems.
+
+#### expand.grid
+
+Let's use the `expand.grid()` R function to write out every combination of the elements in *n* vectors
+
+  1. List all possible outcomes
+  
+```{r}
+rolls <- expand.grid(die, die)
+```
+  
+Rolls now includes all 36 combinations of two copies of die. You can do this for more than 2 combinations.
+
+```{r}
+expand.grid(die, die, die)
+```
+  2. Determine the *value* of each outcome. Create a new column called value which is the sum of the first two columns.
+  
+```{r}
+rolls$value <- rolls$Var1 + rolls$Var2
+head(rolls, 3)
+```
+  3. Get the probability of each outcome
+  
+"The probability that *n* independent, random events all occur is equal to the product of the probabilities that each random event occurs"
+
+OR
+
+`P(A & B & C & ...) P(A) * P(B) * P(C) ...`
+
+`E.g. P (1 & 1) = P(1) * P(1) = 1/8 * 1/8  = 1/64`
+
+ - Create a lookup table of probabilities for each die:
+ 
+```{r}
+prob <- c("1" = 1/8, "2" = 1/8, "3" = 1/8, "4" = 1/8, "5" = 1/8, "6" = 3/8)
+prob
+```
+ 
+If you subset this `prob` vector by `rolls$Var1`, you will get a vector of probabilities keyed to the values of `Var1`:
+
+```{r}
+prob[rolls$Var1]
+```
+
+ - now we can assign it to the `rolls` dataframe:
+ 
+```{r}
+rolls$prob1 <- prob[rolls$Var1]
+head(rolls, 3)
+```
+And repeat for `Var2`:
+
+```{r}
+rolls$prob2 <- prob[rolls$Var2]
+head(rolls, 3)
+```
+ - Now we can calculate the probability of rolling each combination by `prob1 * prob2`:
+ 
+```{r}
+rolls$prob <- rolls$prob1 * rolls$prob2
+head(rolls, 3)
+```
+
+We now have 1) each outcome, 2) the value of each outcome, and 3) the probability of each outcome, so we can compute the expected value:
+
+```{r}
+sum(rolls$value * rolls$prob)
+```
+
+Now let's apply it to the slot machine game:
+
+  1. List out all combinations of the 3 slot machine symbols
+  2. Calculate the probability of getting each combination when you play
+  3. Determine the prize you would get for each combination
+  
+Finally, compute the expected value from all combinations of prizes and probabilities.
+
+1. Use `expand.grid()` to make a dataframe that contains every possible combination of 3 symbols from the `wheel` vector:
+
+```{r}
+wheel <- c("DD", "7", "BBB", "BB", "B", "C", "0") 
+```
+
+Remember: set the argument `stringsAsFactors = F` in your `expand.grid` call:
+
+```{r}
+combos <- expand.grid(wheel, wheel, wheel, stringsAsFactors = F)
+head(combos, 3)
+```
+
+You need to run it three times for each combination of 3 symbols. Now create a look-up table to match each symbol to a probability
+
+```{r}
+prob <- c("DD" = 0.03, "7" = 0.03, "BBB" = 0.06, "BB" = 0.1, "B" = 0.25, "C" = 0.01, "0" = 0.52)
+```
+
+And add probs to the dataframe:
+
+```{r}
+combos$prob1 <- prob[combos$Var1]
+combos$prob2 <- prob[combos$Var2]
+combos$prob3 <- prob[combos$Var3]
+head(combos, 3)
+```
+2. How to compute the total probability of each combination? Our 3 slot symbols are all chosen independently, so the same rule applies:
+
+`P(A & B & C & ...) = P(A) * P(B) * P(C) * ...`
+
+
+```{r}
+combos$prob <- combos$prob1 * combos$prob2 * combos$prob3
+head(combos, 3)
+```
+
+You can check your work by summing prob (it should equal 1):
+```{r}
+sum(combos$prob) 
+```
+
+Meaning, you have to get one of these possible combinations every time you play the slot machine.
+
+3. The last thing we need to do is determine a score for each combination (all 343 of them). Let's reload the score code (we will need this later).
+
+#### for Loops
+
+A `forLoop` repeats a chunk of code many times, once for each element in a set of input. It says "Do this for every value of that" in R syntax it looks like:
+
+`for (value in that) {`
+ ` this`
+`}`
+
+The "that" object should be a set of objects (often a vector of numbers of character strings). Example:
+
+```{r}
+for (value in c("My", "first", "for", "loop")) {
+  print("one run")
+}
+```
+
+The for loop will create an object named `value` and assign it a new value on each run of the loop (here, moving along the vector in "that"). Confirm this for yourself:
+
+```{r}
+for (value in c("My", "second", "for", "loop")) {
+  print(value)
+}
+```
+  
+If you look at value you'll see it contains the value of the last element in the set:
+
+```{r}
+value
+```
+
+And you don't need to use 'value', you can use any symbol as long as it appears before the parentheses in 'that'
+
+```{r}
+for (word in c("My", "first", "for", "loop")) {
+  print(word)
+}
+```
+
+3 important notes:
+
+  1. R will run your loop in whichever environment you call it from, so it can overwrite existing objects
+
+  2. In other programming languages, for loops are designed to work with integers, not sets, but R executes the for loop on the members of a set (which may or may not be sequences of integers, for example, the set of 4 character strings in the last code chunk).
+
+  3. R loops do not return output! (What happens in the for loop, stays in the for loop). You have to write your own code within the for loop to save the for loop output
+
+To save output, create an empty vector or list before you run the for loop, that you can access after it has run:
+
+
+```{r}
+chars <- vector(length = 4)
+words <- c("My", "fourth", "for", "loop")
+
+for (i in 1:4) {
+  chars[i] <- words[i]
+}
+chars
+```
+
+Notice how here the for loop is executed on a set of integers which are used to index values in words[i... n]
+
+You'll find in practice that you use for loops, less to run code, and more to fill up vectors and lists with results of code.
+
+Let's apply a for loop to prize. First, create an empty column in combos to store the output of the for loop:
+
+```{r}
+combos$prize <- NA
+```
+
+Now write code to run score on all 343 rows of combos:
+
+```{r}
+for (i in 1:nrow(combos)) {
+  symbols <- as.character(unname(combos[i, 1:3]))
+  combos$prize[i] <- score(symbols)
+}
+```
+
+There are a few different ways of doing this, the key part is to index from 1:343 with "that":
+
+```{r}
+head(combos, 10)
+```
+
+Now we can compute the expected value:
+
+```{r}
+sum(combos$prob * combos$prize)
+```
+
+It's a low payout rate - but we haven't yet added the wild card effects of DD. DD can count as any other symbol, so long as it increases your prize, and it also doubles your prize (for each DD you have)!
+
+We can re-write the score code to include the wild card effects:
+
+```{r}
+score <- function(symbols) {
+  
+  diamonds <- sum(symbols == "DD")
+  cherries <- sum(symbols == "C")
+  
+  # identify case
+  # since diamonds are wild, only nondiamonds
+  # matter for three of a kind (same) and all bars (bars)
+  slots <- symbols[symbols != "DD"]
+  same <- length(unique(slots)) == 1
+  bars <- slots %in% c("B", "BB", "BBB")
+  
+  # assign prize
+  if (diamonds == 3) {
+    prize <- 100
+  } else if (same) {
+    payouts <- c("DD" = 100, "7" = 80, "BBB" = 40, "BB" = 25,
+                  "B" = 10, "C" = 10, "0" = 0)
+    prize <- unname(payouts[slots[1]])
+  } else if (all(bars)) {
+    prize <- 5
+  } else if (cherries > 0) {
+    # diamonds count as cherries
+    # so long as there is one real cherry
+    prize <- c(0, 2, 5)[cherries + diamonds + 1]
+  } else {
+    prize <- 0
+  }
+  
+  # adjust prize for diamonds
+  prize * 2 ^ diamonds
+}
+```
+
+Now update `combos$prize`:
+
+```{r}
+for (i in 1:nrow(combos)) {
+  symbols <- as.character(unname(combos[i, 1:3]))
+  combos$prize[i] <- score(symbols)
+}
+head(combos, 10)
+```
+
+Now we can recompute the expected value:
+
+```{r}
+sum(combos$prob * combos$prize)
+```
+
+Now the payout matches the manufacturer's claim.
+
+R has to companions to the for loop: 
+
+#### while Loops
+
+while loops run a code chunk while the condition is TRUE:
+
+```{r}
+# while (condition) {
+#   code
+# }
+```
+
+Typically the code will eventually change the condition to be `FALSE`, to the end the loop. If it doesn't, you can end the while loop with Escape, or clicking on the stop icon in RStudio.
+
+While loops are much less common in R. You could however use them to compute how long it takes to go broke playing slots.
+
+```{r}
+plays_til_broke <- function(start_with) {
+  cash <- start_with
+  n <- 0
+  while (cash > 0) {
+    cash <- cash - 1 + play()
+    n <- n + 1
+  }
+  n
+}
+```
+
+```{r}
+plays_til_broke(10)
+```
+
+#### repeat Loops
+
+Repeat loops are even more basic than while loops. They will repeat a chunk of code until you tell them to stop, or until they encounter the command 'break' which will stop the loop:
+
+```{r}
+plays_til_broke <- function(start_with) {
+  cash <- start_with
+  n <- 0
+  repeat { # note there is no that or condition!
+    cash <- cash - 1 + play()
+    n <- n + 1
+    if (cash <= 0) {
+      break # so the break has to be introduced within its own conditional if statement
+    }
+  }
+  n
+}
+```
+
+**Summary** You can repeat tasks in R using for, while and repeat loops. For will run a chunk of code once for each object. If you want to save the output, you can assign it to an object that exists outside the for loop.
+
+Unfortunately, R's for loops get a bad rap because they can be slower than other languages. This is not entirely deserved, but speed is important to data analysis. The last chapter will teach how to write fast for loops and fast code in general, which is called **Vectorized Code**, a style of lightning-fast code that takes advantages of all of R's strengths!
+
+
+
+
+  
