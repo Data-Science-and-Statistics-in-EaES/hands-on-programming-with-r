@@ -3546,7 +3546,212 @@ plays_til_broke <- function(start_with) {
 
 Unfortunately, R's for loops get a bad rap because they can be slower than other languages. This is not entirely deserved, but speed is important to data analysis. The last chapter will teach how to write fast for loops and fast code in general, which is called **Vectorized Code**, a style of lightning-fast code that takes advantages of all of R's strengths!
 
-
-
+$~$
 
   
+  
+## Chapter 10: Speed
+
+In this chapter we will cover:
+
+  1. Vectorized Code
+  2. How to Write Vectorized Code
+  3. How to Write Fast for Loops in R
+  4. Vectorized Code in Practice
+      + Loops Versus Vectorized Code
+      
+#### Vectorized Code
+
+Fast code will normally take advantage of:
+
+  1. Logical tests
+  2. Subsetting
+  3. Element-wise execution
+  
+When code does these things, it is *vectorized*.
+
+Consider an non-vectorized example that takes a vector and returns the absolute (positive) values:
+
+```{r}
+abs_loop <- function(vec){
+  for (i in 1:length(vec)) {
+    if (vec[i] < 0) {
+      vec[i] <- -vec[i]
+    }
+  }
+  vec
+}
+```
+
+Alternatively, consider a vectorized version using a logical subsetting method to manipulate every negative number at the samet time:
+
+```{r}
+abs_set <- function(vec){
+  negs <- vec < 0
+  vec[negs] <- vec[negs] * -1
+  vec
+}
+```
+
+Test them out:
+
+```{r}
+abs_loop(c(seq(-20,20,1)))
+```
+
+```{r}
+abs_set(c(seq(-20,20,1)))
+```
+
+You can compare the time it took to run each function using `system.time`. First, create a long vector:
+
+```{r}
+long <- rep(c(-1, 1), 5000000)
+```
+
+Now use `system.time` to measure how much time it takes each function to evaluate long:
+
+```{r}
+system.time(abs_loop(long))
+system.time(abs_set(long))
+```
+
+Most of R's preexisting functions are vectorized, for example try `abs()`:
+
+```{r}
+system.time(abs(long))
+```
+
+#### How to Write Vectorized Code
+
+Writing vectorized code in R is easy because most R functions are already vectorized. Two tips:
+
+  1. Use vectorized functions to complete the sequential steps in your program
+  2. Use logical subsetting to handle parallel cases. Try to manipulate every element in a case at once.
+  
+The following code could be used to convert the slot symbols to a new set.
+
+```{r}
+change_symbols <- function(vec){
+  for (i in 1:length(vec)) {
+    if (vec[i] == "DD") {
+      vec[i] <- "joker"
+    } else if (vec[i] == "C") {
+      vec[i] <- "ace"
+    } else if (vec[i] == "7") {
+      vec[i] <- "king"
+    } else if (vec[i] == "B") {
+      vec[i] <- "queen"
+    } else if (vec[i] == "BB") {
+      vec[i] <- "jack" 
+    } else if (vec[i] == "BBB") {
+      vec[i] <- "ten"
+    } else {
+      vec[i] <- "nine"
+    }
+  }
+  vec
+}
+
+vec <- c("DD", "C", "7", "B", "BB", "BBB", "0")
+
+change_symbols(vec)
+
+many <- rep(vec, 1000000)
+
+system.time(change_symbols(many))
+```
+
+Notice, `change_symbols()` uses a for loop to sort values into seven different cases. 
+
+To vectorize `change_symbols()`, create a logical test that can identify each case:
+
+```{r}
+vec[vec == "DD"]
+
+vec[vec == "C"]
+```
+
+Write code that can change the symbols for each case:
+
+```{r}
+vec[vec == "DD"] <- "joker"
+vec[vec == "C"] <- "ace"
+vec[vec == "7"] <- "king"
+vec[vec == "B"] <- "queen"
+vec[vec == "BB"] <- "jack"
+vec[vec == "BBB"] <- "ten"
+vec[vec == "0"] <- "nine"
+``` 
+
+When you combine this into a function, you have a vectorized version of `change_symbols()` that runs much faster"
+
+```{r}
+change_vec <- function (vec) {
+  vec[vec == "DD"] <- "joker"
+  vec[vec == "C"] <- "ace"
+  vec[vec == "7"] <- "king"
+  vec[vec == "B"] <- "queen"
+  vec[vec == "BB"] <- "jack"
+  vec[vec == "BBB"] <- "ten"
+  vec[vec == "0"] <- "nine"
+
+  vec
+}
+```
+
+Test it:
+
+```{r}
+system.time(change_vec(many))
+```
+
+Or, even better, use a lookup table. Look up tables are vectorized becasue they rely on R's vectorized seletion operations:
+
+```{r}
+change_vec2 <- function(vec) {
+  tb <- c("DD" = "joker", "C" = "ace", "7" = "king", "B" = "queen", "BB" = "jack",
+          "BBB" == "ten", "0" == "nine")
+  unname(tb[vec])
+}
+```
+
+Test it:
+
+```{r}
+system.time(change_vec2(many))
+```
+
+Fun fact: the reason R for loops run slowly is because you do not compile R code (unlike in C and Fortran)
+
+Tip: You can often spot a potential for vectorized code with a combination of `for` and `if`
+
+#### How to Write Fast For Loops in R
+
+Two tips for faster for loops:
+
+  1. Do as much as you can outside the for loop
+  2. Make sure the storage objects you use within the loop are large enough to contain **all** the values
+  
+This first example preassignes enough NAs to the output object and runs quickly:
+  
+```{r}
+system.time({
+  output <- rep(NA, 1000000)
+  for (i in 1:1000000) {
+    output[i] <- i + 1
+  }
+})
+```
+  
+However, this example assigned `output` to length 0 and takes much longer to run:
+  
+```{r}
+system.time({
+  output <- NA
+  for (i in 1:1000000) {
+    output[i] <- i + 1
+  }
+})
+```
+
