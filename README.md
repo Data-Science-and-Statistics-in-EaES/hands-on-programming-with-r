@@ -53,7 +53,6 @@ This is a **practice-focused lab**, not a trick assignment. The goal is fluency,
 ## Submission
 
 - Commit and push your completed `.Rmd` file to your GitHub repo
-- Submit the **GitHub repository link** on Canvas
 - Your document should:
   - Knit without errors
   - Contain your own code
